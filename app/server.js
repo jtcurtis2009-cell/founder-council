@@ -4,7 +4,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { withPortraits } = require('./portraits');
+const { withPortraits, setMouth } = require('./portraits');
 const { spawn, execFile } = require('child_process');
 
 const PORT = Number(process.env.PORT) || 4730;
@@ -169,6 +169,13 @@ http.createServer((req, res) => {
   if (p === '/api/health') return send(res, 200, { ok: true, ask: true, manage: true });
   if (p === '/api/job') return send(res, 200, jobStatus());
   if (p === '/api/update' && req.method === 'POST') return update(res);
+  if (p === '/api/mouth' && req.method === 'POST') {
+    const seat = url.searchParams.get('seat'), x = Number(url.searchParams.get('x')), y = Number(url.searchParams.get('y'));
+    if (!readJSON(ROSTER, { seats: [] }).seats.some(s => s.id === seat) || !(x >= 0 && x <= 100 && y >= 0 && y <= 100))
+      return send(res, 400, { error: 'Bad mouth position.' });
+    setMouth(seat, Math.round(x * 10) / 10, Math.round(y * 10) / 10);
+    return send(res, 200, { ok: true });
+  }
   if (p === '/api/portrait' && (req.method === 'POST' || req.method === 'DELETE')) {
     const name = portraitTarget(url);
     if (!name) return send(res, 400, { error: 'Unknown advisor or frame.' });

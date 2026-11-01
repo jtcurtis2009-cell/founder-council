@@ -19,7 +19,7 @@
     return `<div class="avatar photo${seat.portraitTalk ? ' has-talk' : ''}">
       <img class="base" src="${esc(seat.portrait)}" alt="" draggable="false">
       ${seat.portraitTalk ? `<img class="talk" src="${esc(seat.portraitTalk)}" alt="" draggable="false">`
-        : `<img class="jaw" src="${esc(seat.portrait)}" alt="" draggable="false" style="--mx:${(seat.mouth || {}).x ?? 50}%;--my:${(seat.mouth || {}).y ?? 52}%">`}
+        : `<img class="jaw" src="${esc(seat.portrait)}" alt="" draggable="false" style="--mx:${(seat.mouth || {}).x ?? 50}%;--my:${(seat.mouth || {}).y ?? 55}%">`}
       ${seat.portraitBlink ? `<img class="blinkf" src="${esc(seat.portraitBlink)}" alt="" draggable="false">` : ''}
     </div>`;
   }

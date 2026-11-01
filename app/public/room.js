@@ -268,9 +268,14 @@
   // ---------- new debate ----------
   const dlg = $('askDialog'), form = $('askForm');
   function showAskError(msg) { $('askError').textContent = msg; $('askError').classList.toggle('hidden', !msg); }
-  $('newBtn').onclick = () => { showAskError(''); dlg.showModal(); form.question.focus(); };
+  $('newBtn').onclick = () => { showAskError(''); dlg.showModal(); syncMode(); form.question.focus(); };
   $('askCancel').onclick = () => dlg.close();
   const PLAN_Q = 'Build our plan to reach 2,000 units across boutique hotels and short-term rentals.';
+  function syncMode() {
+    form.options.placeholder = form.mode.value === 'plan'
+      ? 'Leave blank: the Chair proposes growth paths (organic, acquisitions, hotels, new markets)'
+      : 'Hire a rep at $80k/yr\nSpend $80k on ads\nDo both at half size';
+  }
   form.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => {
     const plan = form.mode.value === 'plan';
     if (plan && !form.question.value.trim()) form.question.value = PLAN_Q;
@@ -358,9 +363,13 @@
   function renderFaces() {
     $('facesGrid').innerHTML = S.roster.seats.map(seat => `<div class="face-row">
       <div class="who"><b style="color:${seat.color}">${esc(seat.name)}</b><span>${esc(seat.pillar)}</span></div>
-      ${KINDS.map(([kind, label, field]) => `<label class="slot" data-seat="${esc(seat.id)}" data-kind="${kind}">
+      ${KINDS.map(([kind, label, field]) => {
+        const isMain = kind === 'base' && seat[field];
+        const m = seat.mouth || { x: 50, y: 55 };
+        return `<label class="slot${isMain ? ' has-img' : ''}" data-seat="${esc(seat.id)}" data-kind="${kind}" ${isMain ? 'title="Click on the mouth to set where the lips move"' : ''}>
         ${seat[field] ? `<img src="${esc(seat[field])}?v=${Date.now()}" alt=""><button type="button" class="x" title="Remove">✕</button>` : `${label}<br>drop image`}
-        <input type="file" accept="image/png,image/jpeg,image/webp"></label>`).join('')}
+        ${isMain ? `<span class="mouth-dot" style="left:${m.x}%;top:${m.y}%"></span><span class="change">click mouth</span>` : ''}
+        <input type="file" accept="image/png,image/jpeg,image/webp"></label>`; }).join('')}
     </div>`).join('');
     $('facesGrid').querySelectorAll('.slot').forEach(slot => {
       const upload = async file => {
@@ -371,6 +380,14 @@
         await reloadRoster(); renderFaces(); refreshTable();
       };
       slot.querySelector('input').onchange = e => upload(e.target.files[0]);
+      if (slot.classList.contains('has-img')) slot.addEventListener('click', async e => {
+        if (e.target.closest('.x')) return;
+        e.preventDefault();  // don't open the file picker; set the mouth position instead
+        const r = slot.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width) * 100, y = ((e.clientY - r.top) / r.height) * 100;
+        await fetch(`/api/mouth?seat=${slot.dataset.seat}&x=${x.toFixed(1)}&y=${y.toFixed(1)}`, { method: 'POST' });
+        await reloadRoster(); renderFaces(); refreshTable(); toast('Mouth position saved.', 1800);
+      });
       slot.ondragover = e => { e.preventDefault(); slot.classList.add('drag'); };
       slot.ondragleave = () => slot.classList.remove('drag');
       slot.ondrop = e => { e.preventDefault(); slot.classList.remove('drag'); upload(e.dataTransfer.files[0]); };

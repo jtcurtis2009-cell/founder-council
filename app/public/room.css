@@ -106,7 +106,7 @@ h1 { font-size: clamp(20px, 3vw, 30px); margin: 4px 0 8px; font-weight: 800; }
 .seat.speaking .avatar.photo .talk { animation: talk .24s steps(1) infinite; }
 .seat.speaking .avatar.photo:not(.has-talk) .base { animation: speakBob .9s ease-in-out infinite alternate; transform-origin: 50% 85%; }
 /* automatic talking for portraits without a talk frame: the chin area drops and rises like a jaw */
-.avatar.photo .jaw { clip-path: ellipse(17% 11% at var(--mx) calc(var(--my) + 7%)); opacity: 0; }
+.avatar.photo .jaw { clip-path: ellipse(15% 10% at var(--mx) calc(var(--my) + 6%)); opacity: 0; }
 .seat.speaking .avatar.photo .jaw { opacity: 1; animation: jaw .32s ease-in-out infinite alternate, speakBob .9s ease-in-out infinite alternate; }
 @keyframes jaw { 0% { translate: 0 0; } 30% { translate: 0 0; } 100% { translate: 0 3.2%; } }
 @keyframes speakBob { from { transform: scale(1) rotate(-.6deg); } to { transform: scale(1.035) rotate(.6deg) translateY(-1.5%); } }
@@ -189,7 +189,12 @@ dialog .mode input:focus-visible + span { outline: 2px solid var(--accent); }
 .slot { position: relative; aspect-ratio: 1; border: 2px dashed var(--panel-b); border-radius: 12px; display: flex; align-items: center; justify-content: center;
   text-align: center; font-size: 12px; color: var(--muted); cursor: pointer; overflow: hidden; background: rgba(255,255,255,.03); }
 .slot.drag { border-color: var(--accent); background: rgba(96,165,250,.15); }
-.slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; }
+.slot.has-img { cursor: crosshair; }
+.slot .mouth-dot { position: absolute; z-index: 2; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+  border: 2px solid #fff; background: #f43f5e; box-shadow: 0 0 0 2px rgba(0,0,0,.5); pointer-events: none; }
+.slot .change { position: absolute; left: 4px; bottom: 4px; z-index: 2; font-size: 10px; background: rgba(0,0,0,.6); color: #fff;
+  border-radius: 6px; padding: 2px 5px; }
 .slot .x { position: absolute; top: 4px; right: 4px; z-index: 2; border: 0; border-radius: 50%; width: 22px; height: 22px; padding: 0;
   background: rgba(0,0,0,.6); color: #fff; cursor: pointer; font-size: 12px; }
 dialog .slot input[type=file] { display: none; }

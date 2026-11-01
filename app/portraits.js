@@ -18,7 +18,15 @@ function find(name) {
 }
 
 // inline=true embeds images as data: URIs (for the single-file export)
+const MOUTHS = path.join(DIR, 'mouth.json');
+function readMouths() { try { return JSON.parse(fs.readFileSync(MOUTHS, 'utf8')); } catch { return {}; } }
+function setMouth(seat, x, y) {
+  const m = readMouths(); m[seat] = { x, y };
+  fs.mkdirSync(DIR, { recursive: true }); fs.writeFileSync(MOUTHS, JSON.stringify(m, null, 2));
+}
+
 function withPortraits(roster, inline = false) {
+  const mouths = readMouths();
   const src = f => (inline ? `data:${MIME[f.ext]};base64,${fs.readFileSync(f.file).toString('base64')}` : f.url);
   return {
     ...roster,
@@ -26,9 +34,9 @@ function withPortraits(roster, inline = false) {
       const base = find(seat.id);
       if (!base) return seat;
       const talk = find(`${seat.id}-talk`), blink = find(`${seat.id}-blink`);
-      return { ...seat, portrait: src(base), portraitTalk: talk ? src(talk) : undefined, portraitBlink: blink ? src(blink) : undefined };
+      return { ...seat, portrait: src(base), portraitTalk: talk ? src(talk) : undefined, portraitBlink: blink ? src(blink) : undefined, mouth: mouths[seat.id] || seat.mouth };
     }),
   };
 }
 
-module.exports = { withPortraits };
+module.exports = { withPortraits, setMouth };
