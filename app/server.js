@@ -12,7 +12,7 @@ const C = require('./config');
 const { PORT, ROOT, PUBLIC, SESSIONS, ROSTER } = C;
 C.seedDataDir();
 
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.webmanifest': 'application/manifest+json' };
 
 function send(res, code, body, type = 'application/json') {
   res.writeHead(code, { 'Content-Type': type + '; charset=utf-8', 'Cache-Control': 'no-store' });
@@ -280,7 +280,7 @@ function authed(req) {
   return !!m && m[1].length === AUTH_TOKEN.length && crypto.timingSafeEqual(Buffer.from(m[1]), Buffer.from(AUTH_TOKEN));
 }
 const LOGIN_PAGE = err => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Founder Council</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,sans-serif;
+<title>Founder Council</title><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icon-180.png"><meta name="theme-color" content="#071a33"><meta name="apple-mobile-web-app-capable" content="yes"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,sans-serif;
 background:radial-gradient(ellipse at 50% 20%,#1d4f8f,#071a33 80%);color:#e8f0ff}form{background:rgba(14,40,78,.8);border:1px solid rgba(120,170,255,.25);
 border-radius:16px;padding:28px;width:min(340px,calc(100vw - 32px));box-sizing:border-box}h1{margin:0 0 6px;font-size:22px}p{margin:0 0 16px;color:#9db3d6;font-size:14px}
 input,button{width:100%;box-sizing:border-box;font:inherit;padding:11px 12px;border-radius:9px}input{border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.06);color:#fff}
@@ -309,6 +309,9 @@ http.createServer((req, res) => {
 
   if (AUTH_TOKEN) {
     if (p === '/login') return send(res, 200, LOGIN_PAGE(''), 'text/html');
+    if (/^\/(manifest\.webmanifest|icon-\d+\.png)$/.test(p)) {   // app icon + manifest load before sign-in
+      return fs.readFile(path.join(PUBLIC, p), (err, data) => err ? send(res, 404, 'not found', 'text/plain') : send(res, 200, data, p.endsWith('.png') ? 'image/png' : 'application/manifest+json'));
+    }
     if (p === '/api/login' && req.method === 'POST') return login(req, res);
     if (!authed(req)) {
       if (p.startsWith('/api/')) return send(res, 401, { error: 'Please sign in.' });

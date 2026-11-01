@@ -139,6 +139,11 @@ Notes:
 - Pushing to `main` redeploys automatically, so there's no Update button in the hosted room.
 - Settings (environment variables): `COUNCIL_MODEL` (default `claude-opus-5-5`), `COUNCIL_RUNNER` (`api` or `claude`), `HOST`, `PORT`, `DATA_DIR`, `TEAM_PASSWORD`.
 
+## Sharing with a business partner
+
+- **Easiest:** send the team website link and password. On iPhone, open it in Safari → Share → **Add to Home Screen**; on a Mac in Chrome, use the install icon in the address bar. It then opens like an app.
+- **Their own Mac copy:** add them as a collaborator (GitHub repo → Settings → Collaborators → Add people). They sign in to GitHub, open the repo, click **Code → Download ZIP**, unzip it, and double-click **Install Founder Council.command** (first time: right-click → Open → Open). It checks Node.js, installs Claude Code, walks them through the Claude sign-in and opens the room. After that they use **Start Founder Council.command**. Their Mac copy uses their own Claude subscription and keeps its own debates.
+
 ## Realistic portraits
 Drop images into `app/public/portraits/` named after a seat (`hormozi.png`, `buffett.jpg`, …) and refresh the page. The room uses them in place of the drawn faces. Add `<id>-talk.png` (mouth open) and `<id>-blink.png` (eyes closed) frames for talking and blinking animation. See `app/public/portraits/README.md` for an image-generator prompt that produces the 3D animated style. Portrait images are git-ignored so they stay on your machine.
 
