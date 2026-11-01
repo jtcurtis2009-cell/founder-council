@@ -122,6 +122,23 @@ app/public/                         room UI: index.html, room.css, room.js, avat
 sessions/                           your councils (git-ignored) + one example
 ```
 
+## Team version (hosted online)
+
+The same room, on the internet behind a team password, so teammates can watch and start debates from any device without your Mac. In hosted mode, debates run through the **Anthropic API** (pay-per-use) instead of Claude Code.
+
+1. **Make this repo private** (GitHub → Settings → Change visibility), since the company profile is in it.
+2. **Create an API key** at https://console.anthropic.com: add credits under Billing, then API Keys → Create Key. Setting a monthly spend limit is a good idea.
+3. **Deploy on Render** (https://render.com): sign up with GitHub → **New + → Blueprint** → pick this repo. Render reads `render.yaml` and asks for:
+   - `ANTHROPIC_API_KEY`: the key from step 2
+   - `TEAM_PASSWORD`: the password your team will type
+   Click **Apply**. After a few minutes you get a link like `https://founder-council.onrender.com`.
+4. Share the link and password with your team.
+
+Notes:
+- Debates, faces and the company profile live on the server's disk (`DATA_DIR`), so they survive restarts and redeploys. On first boot the company profile and example debates are copied from the repo; after that, edit the profile with **🏢 Company** in the hosted room.
+- Pushing to `main` redeploys automatically, so there's no Update button in the hosted room.
+- Settings (environment variables): `COUNCIL_MODEL` (default `claude-opus-5-5`), `COUNCIL_RUNNER` (`api` or `claude`), `HOST`, `PORT`, `DATA_DIR`, `TEAM_PASSWORD`.
+
 ## Realistic portraits
 Drop images into `app/public/portraits/` named after a seat (`hormozi.png`, `buffett.jpg`, …) and refresh the page. The room uses them in place of the drawn faces. Add `<id>-talk.png` (mouth open) and `<id>-blink.png` (eyes closed) frames for talking and blinking animation. See `app/public/portraits/README.md` for an image-generator prompt that produces the 3D animated style. Portrait images are git-ignored so they stay on your machine.
 

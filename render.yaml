@@ -1,0 +1,28 @@
+# One-click deploy on Render (render.com): New → Blueprint → pick this repo.
+# You'll be asked for ANTHROPIC_API_KEY and TEAM_PASSWORD; everything else is preset.
+services:
+  - type: web
+    name: founder-council
+    runtime: node
+    plan: starter            # needed for the persistent disk below
+    buildCommand: npm install --omit=dev
+    startCommand: node app/server.js
+    healthCheckPath: /login
+    autoDeploy: true         # pushes to main redeploy automatically
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATA_DIR
+        value: /var/data
+      - key: COUNCIL_RUNNER
+        value: api
+      - key: ANTHROPIC_API_KEY
+        sync: false          # paste your key from console.anthropic.com
+      - key: TEAM_PASSWORD
+        sync: false          # the password your team will type to get in
+    disk:
+      name: council-data
+      mountPath: /var/data   # debates, faces and the company profile live here
+      sizeGB: 1

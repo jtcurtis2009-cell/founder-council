@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DIR = path.join(__dirname, 'public', 'portraits');
+const DIR = require('./config').PORTRAITS;
 const EXTS = ['png', 'jpg', 'jpeg', 'webp'];
 const MIME = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' };
 

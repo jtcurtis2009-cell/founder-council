@@ -7,11 +7,10 @@ const path = require('path');
 const { withPortraits, setMouth } = require('./portraits');
 const { spawn, execFile } = require('child_process');
 
-const PORT = Number(process.env.PORT) || 4730;
-const ROOT = path.join(__dirname, '..');
-const PUBLIC = path.join(__dirname, 'public');
-const SESSIONS = path.join(ROOT, 'sessions');
-const ROSTER = path.join(ROOT, '.claude', 'skills', 'council', 'roster.json');
+const crypto = require('crypto');
+const C = require('./config');
+const { PORT, ROOT, PUBLIC, SESSIONS, ROSTER } = C;
+C.seedDataDir();
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
 
@@ -100,6 +99,39 @@ function describe(tool, input, roster) {
 
 let child = null;
 function startJob(q, res) {
+  if (C.RUNNER === 'api') return startApiJob(q, res);
+  return startClaudeJob(q, res);
+}
+
+let apiRun = null;
+function startApiJob(q, res) {
+  if (job && job.status === 'running') return send(res, 409, { error: 'A debate is already running. Wait for its verdict, or cancel it.' });
+  if (!process.env.ANTHROPIC_API_KEY) return send(res, 500, { error: 'ANTHROPIC_API_KEY is not set on the server.' });
+  const { CouncilRun, makeClient } = require('./api-runner');
+  job = { status: 'running', started: Date.now(), lastOutput: Date.now(), title: q.question.slice(0, 120), activity: [], blocked: [], result: '' };
+  const note = text => { job.lastOutput = Date.now(); job.activity.push({ t: Date.now(), text }); if (job.activity.length > 40) job.activity.shift(); };
+  note('Starting the council');
+  try {
+    apiRun = new CouncilRun(q, { client: makeClient(), note });
+  } catch (e) { job.status = 'failed'; job.error = 'Could not start: ' + e.message; return send(res, 500, { error: job.error }); }
+  apiRun.run().then(() => { job.status = 'done'; job.finished = Date.now(); })
+    .catch(e => {
+      job.finished = Date.now();
+      if (apiRun.cancelled) { job.status = 'cancelled'; return; }
+      job.status = 'failed';
+      const status = e && e.status ? ` (API error ${e.status})` : '';
+      job.error = (e && e.status === 401) ? 'The Anthropic API key on the server is invalid.'
+        : (e && e.status === 429) ? 'The Anthropic API is rate-limiting this key. Wait a minute and try again.'
+        : (e && e.status === 400 && /credit|billing/i.test(e.message || '')) ? 'The Anthropic account is out of credits. Add credits at console.anthropic.com.'
+        : `The debate stopped${status}: ${(e && e.message) || e}`;
+      console.error('  ✖ Debate failed:', e);
+    })
+    .finally(() => { apiRun = null; });
+  console.log('  ▶ New debate started (API): ' + job.title);
+  send(res, 202, { ok: true });
+}
+
+function startClaudeJob(q, res) {
   if (job && job.status === 'running') return send(res, 409, { error: 'A debate is already running. Wait for its verdict, or cancel it.' });
   const logFile = path.join(SESSIONS, '.last-run.log');
   fs.mkdirSync(SESSIONS, { recursive: true });
@@ -173,6 +205,7 @@ function startJob(q, res) {
 }
 
 function cancelJob(res) {
+  if (job && job.status === 'running' && apiRun) { apiRun.cancelled = true; job.cancelled = true; return send(res, 200, { ok: true }); }
   if (!job || job.status !== 'running' || !child) return send(res, 400, { error: 'No debate is running.' });
   job.cancelled = true; child.kill('SIGTERM');
   send(res, 200, { ok: true });
@@ -185,11 +218,12 @@ function jobStatus() {
 }
 
 // ---------- In-room "Update" and "Company" editor ----------
-const COMPANY = path.join(ROOT, '.claude', 'skills', 'council', 'company.md');
+const COMPANY = C.COMPANY;
 const git = (args) => new Promise(resolve =>
   execFile('git', args, { cwd: ROOT, timeout: 120000 }, (err, stdout, stderr) => resolve({ ok: !err, out: (stdout + stderr).trim() })));
 
 async function update(res) {
+  if (C.HOSTED) return send(res, 400, { error: 'The hosted version updates itself when changes are pushed to GitHub.' });
   if (job && job.status === 'running') return send(res, 409, { error: 'A debate is running. Update after it finishes.' });
   if (!fs.existsSync(path.join(ROOT, '.git'))) return send(res, 400, { error: 'This folder was not downloaded with git, so it cannot update itself. Download it again with: git clone https://github.com/jtcurtis2009-cell/founder-council.git' });
   const before = await git(['rev-parse', 'HEAD']);
@@ -212,7 +246,7 @@ async function update(res) {
 }
 
 // ---------- Faces: upload portrait images from the browser ----------
-const PORTRAITS = path.join(__dirname, 'public', 'portraits');
+const PORTRAITS = C.PORTRAITS;
 function imageExt(buf) {
   if (buf.length > 8 && buf.slice(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'png';
   if (buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'jpg';
@@ -237,11 +271,57 @@ function removePortrait(name) {
   for (const ext of ['png', 'jpg', 'jpeg', 'webp']) { try { fs.unlinkSync(path.join(PORTRAITS, `${name}.${ext}`)); } catch {} }
 }
 
+// ---------- Team password (hosted) ----------
+const AUTH_TOKEN = C.TEAM_PASSWORD ? crypto.createHmac('sha256', C.TEAM_PASSWORD).update('founder-council-v1').digest('hex') : '';
+const attempts = new Map();
+function authed(req) {
+  if (!AUTH_TOKEN) return true;
+  const m = (req.headers.cookie || '').match(/(?:^|;\s*)fc_auth=([a-f0-9]+)/);
+  return !!m && m[1].length === AUTH_TOKEN.length && crypto.timingSafeEqual(Buffer.from(m[1]), Buffer.from(AUTH_TOKEN));
+}
+const LOGIN_PAGE = err => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Founder Council</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,sans-serif;
+background:radial-gradient(ellipse at 50% 20%,#1d4f8f,#071a33 80%);color:#e8f0ff}form{background:rgba(14,40,78,.8);border:1px solid rgba(120,170,255,.25);
+border-radius:16px;padding:28px;width:min(340px,calc(100vw - 32px));box-sizing:border-box}h1{margin:0 0 6px;font-size:22px}p{margin:0 0 16px;color:#9db3d6;font-size:14px}
+input,button{width:100%;box-sizing:border-box;font:inherit;padding:11px 12px;border-radius:9px}input{border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.06);color:#fff}
+button{margin-top:10px;border:0;background:#60a5fa;color:#04142b;font-weight:700;cursor:pointer}.e{color:#fca5a5;margin-top:10px;font-size:14px}</style></head>
+<body><form method="post" action="/api/login"><h1>◆ Founder Council</h1><p>Enter the team password.</p>
+<input type="password" name="password" autofocus autocomplete="current-password" aria-label="Team password"><button>Enter</button>${err ? `<div class="e">${err}</div>` : ''}</form></body></html>`;
+
+async function login(req, res) {
+  const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+  const a = attempts.get(ip) || { n: 0, reset: Date.now() + 10 * 60 * 1000 };
+  if (Date.now() > a.reset) { a.n = 0; a.reset = Date.now() + 10 * 60 * 1000; }
+  if (++a.n > 10) { attempts.set(ip, a); return send(res, 429, LOGIN_PAGE('Too many attempts. Try again in 10 minutes.'), 'text/html'); }
+  attempts.set(ip, a);
+  const body = await readBody(req, 2000).catch(() => '');
+  const pw = new URLSearchParams(body).get('password') || '';
+  const ok = pw.length === C.TEAM_PASSWORD.length && crypto.timingSafeEqual(Buffer.from(pw), Buffer.from(C.TEAM_PASSWORD));
+  if (!ok) return send(res, 401, LOGIN_PAGE('Wrong password.'), 'text/html');
+  const secure = (req.headers['x-forwarded-proto'] || '').includes('https') ? '; Secure' : '';
+  res.writeHead(302, { 'Set-Cookie': `fc_auth=${AUTH_TOKEN}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${60 * 60 * 24 * 90}${secure}`, Location: '/' });
+  res.end();
+}
+
 http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
-  const p = decodeURIComponent(url.pathname);
+  let p; try { p = decodeURIComponent(url.pathname); } catch { return send(res, 400, 'bad request', 'text/plain'); }
 
-  if (p === '/api/health') return send(res, 200, { ok: true, ask: true, manage: true });
+  if (AUTH_TOKEN) {
+    if (p === '/login') return send(res, 200, LOGIN_PAGE(''), 'text/html');
+    if (p === '/api/login' && req.method === 'POST') return login(req, res);
+    if (!authed(req)) {
+      if (p.startsWith('/api/')) return send(res, 401, { error: 'Please sign in.' });
+      res.writeHead(302, { Location: '/login' }); return res.end();
+    }
+  }
+  if (C.HOSTED && p.startsWith('/portraits/')) {
+    const f = path.normalize(path.join(PORTRAITS, p.slice('/portraits/'.length)));
+    if (!f.startsWith(PORTRAITS) || f.endsWith('.json')) return send(res, 404, 'not found', 'text/plain');
+    return fs.readFile(f, (err, data) => err ? send(res, 404, 'not found', 'text/plain') : send(res, 200, data, MIME[path.extname(f)] || 'application/octet-stream'));
+  }
+
+  if (p === '/api/health') return send(res, 200, { ok: true, ask: true, manage: true, update: !C.HOSTED, hosted: C.HOSTED });
   if (p === '/api/job') return send(res, 200, jobStatus());
   if (p === '/api/job/cancel' && req.method === 'POST') return cancelJob(res);
   if (p === '/api/update' && req.method === 'POST') return update(res);
@@ -305,6 +385,6 @@ http.createServer((req, res) => {
     if (err) return send(res, 404, 'not found', 'text/plain');
     send(res, 200, data, MIME[path.extname(file)] || 'application/octet-stream');
   });
-}).listen(PORT, '127.0.0.1', () => {
-  console.log(`\n  Founder Council room is open → http://localhost:${PORT}\n  Leave this running. Click "+ New debate" in the room, or type /council <your decision> in Claude Code.\n`);
+}).listen(PORT, C.HOST, () => {
+  console.log(`\n  Founder Council room is open → http://localhost:${PORT}${C.HOSTED ? ' (hosted mode, debates via ' + C.RUNNER + ')' : ''}\n  Leave this running. Click "+ New debate" in the room, or type /council <your decision> in Claude Code.\n`);
 });

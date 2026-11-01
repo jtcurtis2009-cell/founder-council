@@ -437,7 +437,7 @@
     S.roster.seats.forEach(s => { S.seatsById[s.id] = s; });
     if (S.roster.disclaimer) $('disclaimer').textContent = S.roster.disclaimer;
     if (S.roster.company) $('company').textContent = S.roster.company;
-    try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); if (h.manage) { $('facesBtn').classList.remove('hidden'); $('companyBtn').classList.remove('hidden'); $('updateBtn').classList.remove('hidden'); } } catch {}
+    try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); if (h.manage) { $('facesBtn').classList.remove('hidden'); $('companyBtn').classList.remove('hidden'); if (h.update !== false) $('updateBtn').classList.remove('hidden'); } } catch {}
     try { const j = await (await fetch('/api/job')).json(); if (j.status === 'running') watchJob(); } catch {}
     renderTable(S.roster.default_board);
     const list = await refreshList();
