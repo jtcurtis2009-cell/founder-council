@@ -7,7 +7,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
 <link rel="icon" href="/icon-192.png">
-<meta name="theme-color" content="#0E1F22">
+<meta name="theme-color" content="#F4F2EE">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Council">
 
@@ -47,11 +47,13 @@
     <div class="playback" aria-label="Playback">
       <button id="replayBtn" class="btn" title="Replay from the start">↺ Replay</button>
       <button id="speedBtn" class="btn" title="Playback speed" aria-label="Playback speed">1×</button>
-      <button id="skipBtn" class="btn" title="Jump to the verdict"><span class="lbl">Jump to </span>verdict →</button>
+      <button id="skipBtn" class="btn" title="Jump to the verdict"><span class="lbl">Jump to</span>verdict →</button>
     </div>
     <div class="sr-only" aria-live="polite" id="srLive"></div>
-    <div class="table" id="table"></div>
-    <div class="options" id="options"></div>
+    <div class="theater">
+      <div class="table" id="table"></div>
+      <div class="options" id="options"></div>
+    </div>
 
     <div class="speech" id="speech">
       <div class="speech-who" id="speechWho">The Chair</div>

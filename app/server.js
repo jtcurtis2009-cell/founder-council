@@ -280,11 +280,11 @@ function authed(req) {
   return !!m && m[1].length === AUTH_TOKEN.length && crypto.timingSafeEqual(Buffer.from(m[1]), Buffer.from(AUTH_TOKEN));
 }
 const LOGIN_PAGE = err => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Founder Council</title><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icon-180.png"><meta name="theme-color" content="#0E1F22"><meta name="apple-mobile-web-app-capable" content="yes"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:Inter,system-ui,sans-serif;
-background:radial-gradient(900px 500px at 50% -10%,rgba(36,67,63,.6),transparent 70%),#0E1F22;color:#E4E1DA}form{background:#132B2F;border:1px solid #24433F;
-border-radius:16px;padding:28px;width:min(340px,calc(100vw - 32px));box-sizing:border-box}h1{margin:0 0 6px;font:600 28px 'Cormorant Garamond',Georgia,serif}h1 span{color:#B08D57;font-size:14px;vertical-align:4px;margin-right:6px}p{margin:0 0 16px;color:#CFCBC2;font-size:14px}
-input,button{width:100%;box-sizing:border-box;font:inherit;padding:11px 12px;border-radius:9px}input{border:1px solid #24433F;background:#0E1F22;color:#E4E1DA}input:focus{outline:none;border-color:#B08D57;box-shadow:0 0 0 3px rgba(176,141,87,.2)}
-button{margin-top:10px;border:0;border-radius:999px;background:#B08D57;color:#0E1F22;font-weight:600;cursor:pointer}button:hover{background:#C8A982}.e{color:#ecc9bd;margin-top:10px;font-size:14px}</style></head>
+<title>Founder Council</title><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icon-180.png"><meta name="theme-color" content="#F4F2EE"><meta name="apple-mobile-web-app-capable" content="yes"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:Inter,system-ui,sans-serif;
+background:#F4F2EE;color:#0E1F22}form{background:#FBFAF8;border:1px solid #E4E1DA;box-shadow:0 8px 24px rgba(14,31,34,.08);
+border-radius:16px;padding:28px;width:min(340px,calc(100vw - 32px));box-sizing:border-box}h1{margin:0 0 6px;font:600 28px 'Cormorant Garamond',Georgia,serif}h1 span{color:#B08D57;font-size:14px;vertical-align:4px;margin-right:6px}p{margin:0 0 16px;color:#24433F;font-size:14px}
+input,button{width:100%;box-sizing:border-box;font:inherit;padding:11px 12px;border-radius:9px}input{border:1px solid #CFCBC2;background:#fff;color:#0E1F22}input:focus{outline:none;border-color:#B08D57;box-shadow:0 0 0 3px rgba(176,141,87,.2)}
+button{margin-top:10px;border:0;border-radius:999px;background:#B08D57;color:#0E1F22;font-weight:600;cursor:pointer}button:hover{background:#C8A982}.e{color:#9A4E3A;margin-top:10px;font-size:14px}</style></head>
 <body><form method="post" action="/api/login"><h1><span>◆</span>Founder Council</h1><p>Enter the team password.</p>
 <input type="password" name="password" autofocus autocomplete="current-password" aria-label="Team password"><button>Enter</button>${err ? `<div class="e">${err}</div>` : ''}</form></body></html>`;
 
