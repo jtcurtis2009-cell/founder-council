@@ -1,7 +1,7 @@
 {
   "name": "Founder Council",
   "short_name": "Council",
-  "description": "NOVIQ's council of simulated advisors on the Road to 2,000 units.",
+  "description": "A council of simulated advisors on the Road to 2,000 units.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0E1F22",

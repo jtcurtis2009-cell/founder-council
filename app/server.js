@@ -285,7 +285,7 @@ background:radial-gradient(900px 500px at 50% -10%,rgba(36,67,63,.6),transparent
 border-radius:16px;padding:28px;width:min(340px,calc(100vw - 32px));box-sizing:border-box}h1{margin:0 0 6px;font:600 28px 'Cormorant Garamond',Georgia,serif}h1 span{color:#B08D57;font-size:14px;vertical-align:4px;margin-right:6px}p{margin:0 0 16px;color:#CFCBC2;font-size:14px}
 input,button{width:100%;box-sizing:border-box;font:inherit;padding:11px 12px;border-radius:9px}input{border:1px solid #24433F;background:#0E1F22;color:#E4E1DA}input:focus{outline:none;border-color:#B08D57;box-shadow:0 0 0 3px rgba(176,141,87,.2)}
 button{margin-top:10px;border:0;border-radius:999px;background:#B08D57;color:#0E1F22;font-weight:600;cursor:pointer}button:hover{background:#C8A982}.e{color:#ecc9bd;margin-top:10px;font-size:14px}</style></head>
-<body><form method="post" action="/api/login"><h1><span>◆</span>Founder Council</h1><p>NOVIQ · Enter the team password.</p>
+<body><form method="post" action="/api/login"><h1><span>◆</span>Founder Council</h1><p>Enter the team password.</p>
 <input type="password" name="password" autofocus autocomplete="current-password" aria-label="Team password"><button>Enter</button>${err ? `<div class="e">${err}</div>` : ''}</form></body></html>`;
 
 async function login(req, res) {
