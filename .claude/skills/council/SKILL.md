@@ -23,7 +23,7 @@ Before Step 0, Read `.claude/skills/council/company.md` (who we are, the North S
 - `/council plan [focus]`: **Road to 2,000.** The council builds one joint growth plan instead of judging a single decision. See "Plan mode" below.
 
 ## Non-interactive runs
-If the prompt says it came from the room's "New debate" form (non-interactive), skip Step 0's questions and Step 1's health check (the room is already running), and skip the export in Step 6. Use the details given, propose options if none were given, write any assumptions into the brief's `context`, and go straight to Step 1.
+If the prompt says it came from the room's "New debate" form (non-interactive), skip Step 0's questions and Step 1's health check (the room is already running), and skip the export in Step 6. Every Bash command must start with `node app/log.js` and use the **literal session id** (no `$ID` variables, `cd`, `&&` or pipes), because background mode only allows that exact command. Use the details given, propose options if none were given, write any assumptions into the brief's `context`, and go straight to Step 1.
 
 ## Step 0: Intake
 A good decision needs: **the decision**, **2–4 concrete options (A, B, C…)**, **key numbers** (price, costs, audience size, cash on hand), **constraints** (time, money, team) and **what success looks like**. Also ask which way the user leans.

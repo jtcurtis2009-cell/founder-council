@@ -309,21 +309,38 @@
   });
 
   let jobTimer = null;
+  const fmt = ms => { const s = Math.max(0, Math.round(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+  function showProgress(j) {
+    const box = $('progress');
+    if (!j || j.status !== 'running') { box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    const quiet = j.quietFor > 4 * 60 * 1000;
+    box.classList.toggle('warn', quiet);
+    $('progressTitle').textContent = quiet ? 'The Chair has been quiet for a while' : 'The Chair is working';
+    $('progressTime').textContent = fmt(Date.now() - j.started);
+    $('progressList').innerHTML = (j.activity || []).map(a => `<li>${esc(a.text)}</li>`).join('');
+  }
+  $('cancelBtn').onclick = async () => {
+    if (!confirm('Stop this debate? Anything already logged stays in the room.')) return;
+    await fetch('/api/job/cancel', { method: 'POST' });
+    toast('Debate cancelled.');
+  };
   async function watchJob() {
     clearInterval(jobTimer);
     const tick = async () => {
       let j; try { j = await (await fetch('/api/job')).json(); } catch { return; }
+      showProgress(j);
       if (j.status === 'running') {
         if (!S.id || S.done) setStatus('live', 'the Chair is convening the council…');
       } else {
         clearInterval(jobTimer);
         if (j.status === 'failed') {
-          showAskError((j.error || 'The debate failed.') + (j.tail ? '\n\nLast output:\n' + j.tail.slice(-600) : ''));
+          showAskError(j.error || 'The debate failed.');
           dlg.showModal();
         }
       }
     };
-    tick(); jobTimer = setInterval(() => { tick(); if (S.awaitSince) refreshList(); }, 3000);
+    tick(); jobTimer = setInterval(() => { tick(); if (S.awaitSince) refreshList(); }, 2000);
   }
 
   // ---------- company profile + update ----------

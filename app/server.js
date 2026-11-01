@@ -45,7 +45,7 @@ function listSessions() {
 const CLAUDE_BIN = process.env.CLAUDE_BIN || 'claude';
 const ALLOWED_TOOLS = [
   'Read', 'Write', 'Agent', 'Task', 'Skill',
-  'Bash(node app/log.js:*)', 'Bash(node app/export.js:*)',
+  'Bash(node app/log.js:*)', 'Bash(node app/log.js *)', 'Bash(node ./app/log.js:*)', 'Bash(node app/export.js:*)',
 ];
 let job = null; // { status: 'running'|'done'|'failed', started, finished, log, title }
 
@@ -68,45 +68,120 @@ function buildPrompt(q) {
   lines.push('', 'This run was started from the room\'s "New debate" form and is NON-INTERACTIVE: do not ask follow-up questions.',
     'If details are missing, make conservative assumptions and list them in the brief\'s context.',
     'The room server is already running at http://localhost:' + PORT + '. Do not start it.',
-    'Follow .claude/skills/council/SKILL.md exactly, including logging every event with node app/log.js and writing the verdict and analysis.');
+    'Follow .claude/skills/council/SKILL.md exactly, including logging every event with node app/log.js and writing the verdict and analysis.',
+    'Command form (background mode only allows this): every Bash call must START with `node app/log.js` and use the literal session id, e.g. node app/log.js add 2026-01-01-my-topic <<\'EOF\' ... EOF. Never use shell variables like $ID, cd, &&, or pipes.');
   return lines.join('\n');
 }
 
+function describe(tool, input, roster) {
+  const base = f => String(f || '').split('/').pop();
+  if (tool === 'Bash') {
+    const c = String(input.command || '');
+    if (/app\/log\.js new/.test(c)) return 'Opening the session';
+    if (/app\/log\.js verdict/.test(c)) return 'Saving the verdict write-up';
+    if (/app\/log\.js add/.test(c)) {
+      const m = c.match(/"type"\s*:\s*"(\w+)"/); return 'Sending to the room' + (m ? ` (${m[1]})` : '');
+    }
+    return 'Running: ' + c.slice(0, 70);
+  }
+  if (tool === 'Read') {
+    const f = base(input.file_path);
+    return f === 'company.md' ? 'Reading your company profile' : f === 'industry.md' ? 'Reading the industry brief' : 'Reading ' + f;
+  }
+  if (tool === 'Agent' || tool === 'Task') {
+    const id = String(input.subagent_type || '').replace('council-', '');
+    const seat = (roster.seats || []).find(s => s.id === id);
+    return seat ? `Asking ${seat.name}` : 'Asking an advisor';
+  }
+  if (tool === 'Write') return 'Writing ' + base(input.file_path);
+  if (tool === 'Skill') return 'Loading the council protocol';
+  return tool;
+}
+
+let child = null;
 function startJob(q, res) {
-  if (job && job.status === 'running') return send(res, 409, { error: 'A debate is already running. Wait for its verdict first.' });
+  if (job && job.status === 'running') return send(res, 409, { error: 'A debate is already running. Wait for its verdict, or cancel it.' });
   const logFile = path.join(SESSIONS, '.last-run.log');
   fs.mkdirSync(SESSIONS, { recursive: true });
-  const out = fs.openSync(logFile, 'w');
-  const args = ['-p', buildPrompt(q), '--allowedTools', ...ALLOWED_TOOLS];
-  let child;
+  const out = fs.createWriteStream(logFile);
+  const args = ['-p', buildPrompt(q), '--output-format', 'stream-json', '--verbose', '--allowedTools', ...ALLOWED_TOOLS];
   try {
-    child = spawn(CLAUDE_BIN, args, { cwd: ROOT, stdio: ['ignore', out, out], env: process.env });
+    child = spawn(CLAUDE_BIN, args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], env: process.env });
   } catch (e) {
     return send(res, 500, { error: 'Could not start Claude Code: ' + e.message });
   }
-  job = { status: 'running', started: Date.now(), title: q.question.slice(0, 120), log: logFile };
+  const roster = readJSON(ROSTER, { seats: [] });
+  job = { status: 'running', started: Date.now(), lastOutput: Date.now(), title: q.question.slice(0, 120), log: logFile,
+          activity: [], blocked: [], result: '' };
+  const note = text => { job.activity.push({ t: Date.now(), text }); if (job.activity.length > 40) job.activity.shift(); };
+  note('Starting Claude Code');
+  let buf = '';
+  child.stdout.on('data', chunk => {
+    out.write(chunk); job.lastOutput = Date.now(); buf += chunk;
+    let i;
+    while ((i = buf.indexOf('\n')) >= 0) {
+      const line = buf.slice(0, i); buf = buf.slice(i + 1);
+      let e; try { e = JSON.parse(line); } catch { continue; }
+      if (e.type === 'assistant' && e.message && Array.isArray(e.message.content)) {
+        for (const c of e.message.content) {
+          if (c.type === 'tool_use' && !e.parent_tool_use_id) note(describe(c.name, c.input || {}, roster));
+          if (c.type === 'text' && !e.parent_tool_use_id && c.text.trim()) job.result = c.text.trim();
+        }
+      } else if (e.type === 'user' && e.message && Array.isArray(e.message.content)) {
+        for (const c of e.message.content) {
+          const txt = typeof c.content === 'string' ? c.content : JSON.stringify(c.content || '');
+          if (c.type === 'tool_result' && c.is_error && /permission|approv|not allowed/i.test(txt)) {
+            job.blocked.push(txt.slice(0, 200)); note('Blocked: a command needed approval');
+          }
+        }
+      } else if (e.type === 'result') {
+        job.result = String(e.result || job.result || '');
+        (e.permission_denials || []).forEach(d => job.blocked.push(`${d.tool_name}: ${JSON.stringify(d.tool_input).slice(0, 160)}`));
+        if (e.is_error) job.error = job.result || 'Claude Code reported an error.';
+      }
+    }
+  });
+  child.stderr.on('data', chunk => { out.write(chunk); job.lastOutput = Date.now(); job.stderr = ((job.stderr || '') + chunk).slice(-1500); });
   child.on('error', e => {
     job.status = 'failed';
     job.error = e.code === 'ENOENT'
       ? 'Claude Code is not installed or not on your PATH. Install it with: npm install -g @anthropic-ai/claude-code'
       : e.message;
   });
-  child.on('exit', code => {
-    fs.closeSync(out);
+  child.on('exit', (code, signal) => {
+    out.end(); child = null;
     if (job.status !== 'running') return;
-    job.status = code === 0 ? 'done' : 'failed';
     job.finished = Date.now();
-    if (code !== 0) job.error = 'Claude Code exited with code ' + code + '. If it says you are not logged in, run `claude` once in Terminal and sign in.';
+    const raw = (job.stderr || '') + ' ' + (job.result || '');
+    if (signal === 'SIGTERM' && job.cancelled) { job.status = 'cancelled'; return; }
+    if (/not logged in|please run \/login/i.test(raw)) {
+      job.status = 'failed'; job.error = 'Claude Code is not signed in. Open Terminal, run `claude`, sign in, then type /exit and try again.'; return;
+    }
+    const gotVerdict = fs.readdirSync(SESSIONS, { withFileTypes: true }).some(d => {
+      if (!d.isDirectory()) return false;
+      const f = path.join(SESSIONS, d.name, 'events.jsonl');
+      try { return fs.statSync(f).mtimeMs >= job.started && fs.readFileSync(f, 'utf8').includes('"type":"verdict"'); } catch { return false; }
+    });
+    if (code === 0 && gotVerdict) { job.status = 'done'; return; }
+    job.status = 'failed';
+    job.error = job.error || (code !== 0 ? `Claude Code stopped unexpectedly (code ${code}).` : 'The Chair finished without reaching a verdict.');
+    if (job.blocked.length) job.error += '\n\nBlocked steps:\n- ' + job.blocked.slice(-3).join('\n- ');
+    if (job.result) job.error += '\n\nThe Chair said:\n' + job.result.slice(-600);
   });
   console.log('  ▶ New debate started: ' + job.title);
   send(res, 202, { ok: true });
 }
 
+function cancelJob(res) {
+  if (!job || job.status !== 'running' || !child) return send(res, 400, { error: 'No debate is running.' });
+  job.cancelled = true; child.kill('SIGTERM');
+  send(res, 200, { ok: true });
+}
+
 function jobStatus() {
   if (!job) return { status: 'idle' };
-  let tail = '';
-  try { tail = fs.readFileSync(job.log, 'utf8').slice(-1500); } catch {}
-  return { status: job.status, title: job.title, started: job.started, finished: job.finished, error: job.error, tail };
+  return { status: job.status, title: job.title, started: job.started, finished: job.finished, error: job.error,
+           activity: job.activity.slice(-6), quietFor: Date.now() - job.lastOutput, tail: job.result ? job.result.slice(-600) : '' };
 }
 
 // ---------- In-room "Update" and "Company" editor ----------
@@ -168,6 +243,7 @@ http.createServer((req, res) => {
 
   if (p === '/api/health') return send(res, 200, { ok: true, ask: true, manage: true });
   if (p === '/api/job') return send(res, 200, jobStatus());
+  if (p === '/api/job/cancel' && req.method === 'POST') return cancelJob(res);
   if (p === '/api/update' && req.method === 'POST') return update(res);
   if (p === '/api/mouth' && req.method === 'POST') {
     const seat = url.searchParams.get('seat'), x = Number(url.searchParams.get('x')), y = Number(url.searchParams.get('y'));
