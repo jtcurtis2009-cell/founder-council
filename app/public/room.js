@@ -27,10 +27,11 @@
   function setPhase(name) {
     const order = ['brief', 'Openings', 'Crossfire', 'Final vote', 'verdict'];
     const at = order.indexOf(name);
-    document.querySelectorAll('#phases span').forEach(s => {
+    document.querySelectorAll('#phases [data-phase]').forEach(s => {
       const i = order.indexOf(s.dataset.phase);
       s.classList.toggle('active', i === at);
       s.classList.toggle('done', i < at);
+      if (i === at) s.setAttribute('aria-current', 'step'); else s.removeAttribute('aria-current');
     });
   }
 
@@ -71,6 +72,7 @@
     $('speech').style.setProperty('--seat', s ? s.color : 'var(--accent)');
     $('speechWho').textContent = who;
     $('speechHead').textContent = head || '';
+    $('srLive').textContent = `${who}: ${head || ''}`;
     spotlight(id);
     const words = String(body || '').split(/\s+/).filter(Boolean);
     const ms = words.reduce((t, w) => t + Math.min(55, 18 + w.length * 6), 0) / S.speed;
@@ -150,7 +152,7 @@
         <div class="bars">${keys.map(k => `<div class="bar ${k === e.winner ? 'win' : ''}">
           <span><b>${esc(k)}</b> ${esc(optLabel(k))}${(e.capped || []).includes(k) ? '<span class="cap">ruin cap</span>' : ''}</span>
           <span class="track"><span class="fill" data-w="${Number(scores[k]) * 10}"></span></span><b>${esc(scores[k])}</b></div>`).join('')}</div>
-        ${e.allocation ? (() => { const cols = ['#60a5fa', '#4ade80', '#f59e0b', '#f472b6', '#a78bfa'];
+        ${e.allocation ? (() => { const cols = ['#B08D57', '#9DB38A', '#C8A982', '#7FA7A3', '#A99BC0'];
           const ks = Object.keys(e.allocation);
           return `<div class="cols"><div style="grid-column:1/-1"><h3>Where the effort goes</h3>
             <div class="alloc">${ks.map((k, i) => `<span style="width:${Number(e.allocation[k])}%;background:${cols[i % 5]}">${Number(e.allocation[k]) >= 8 ? esc(k) + ' ' + esc(e.allocation[k]) + '%' : ''}</span>`).join('')}</div>
@@ -246,7 +248,7 @@
     if (sig !== lastList) {
       lastList = sig;
       $('sessionSelect').innerHTML = list.map(s =>
-        `<option value="${esc(s.id)}">${s.done ? '✓' : '●'} ${esc(s.title)}${s.example ? ' (example)' : ''}</option>`).join('')
+        `<option value="${esc(s.id)}">${s.done ? '' : '● Live · '}${esc(s.title)}${s.example ? ' · example' : (s.created ? ' · ' + new Date(s.created).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '')}</option>`).join('')
         || '<option>No sessions yet</option>';
       if (S.id) $('sessionSelect').value = S.id;
     }
@@ -431,13 +433,27 @@
   $('facesBtn').onclick = async () => { await reloadRoster(); renderFaces(); fdlg.showModal(); };
   $('facesClose').onclick = () => fdlg.close();
 
+  // ---------- settings menu ----------
+  const menuBtn = $('menuBtn'), menuList = $('menuList');
+  const closeMenu = () => { menuList.classList.add('hidden'); menuBtn.setAttribute('aria-expanded', 'false'); };
+  menuBtn.onclick = e => {
+    e.stopPropagation();
+    const open = menuList.classList.contains('hidden');
+    menuList.classList.toggle('hidden', !open); menuBtn.setAttribute('aria-expanded', String(open));
+    if (open) { const first = menuList.querySelector('button:not(.hidden)'); if (first) first.focus(); }
+  };
+  menuList.addEventListener('click', closeMenu);
+  document.addEventListener('click', e => { if (!e.target.closest('.menu')) closeMenu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  if (window.matchMedia('(max-width: 1040px)').matches) $('transcript').open = false;
+
   // ---------- boot ----------
   (async function boot() {
     S.roster = await (await fetch('/api/roster')).json();
     S.roster.seats.forEach(s => { S.seatsById[s.id] = s; });
     if (S.roster.disclaimer) $('disclaimer').textContent = S.roster.disclaimer;
     if (S.roster.company) $('company').textContent = S.roster.company;
-    try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); if (h.manage) { $('facesBtn').classList.remove('hidden'); $('companyBtn').classList.remove('hidden'); if (h.update !== false) $('updateBtn').classList.remove('hidden'); } } catch {}
+    try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); if (h.manage) { $('facesBtn').classList.remove('hidden'); $('companyBtn').classList.remove('hidden'); if (h.update !== false) $('updateBtn').classList.remove('hidden'); } else { $('menuBtn').closest('.menu').classList.add('hidden'); } } catch {}
     try { const j = await (await fetch('/api/job')).json(); if (j.status === 'running') watchJob(); } catch {}
     renderTable(S.roster.default_board);
     const list = await refreshList();

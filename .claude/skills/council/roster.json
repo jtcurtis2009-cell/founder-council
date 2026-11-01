@@ -15,7 +15,7 @@
       "pillar": "Time & Leverage",
       "brain": ".claude/skills/council/brains/martell.md",
       "agent": "council-martell",
-      "color": "#38bdf8",
+      "color": "#7FA7A3",
       "avatar": {
         "skin": "#eebf9c",
         "hair": "#2e221b",
@@ -32,7 +32,7 @@
       "pillar": "Offer & Unit Economics",
       "brain": ".claude/skills/council/brains/hormozi.md",
       "agent": "council-hormozi",
-      "color": "#f59e0b",
+      "color": "#C8A982",
       "avatar": {
         "skin": "#d9a17a",
         "hair": "#2b1d14",
@@ -53,7 +53,7 @@
       "pillar": "Risk & Capital",
       "brain": ".claude/skills/council/brains/buffett.md",
       "agent": "council-buffett",
-      "color": "#a3e635",
+      "color": "#9DB38A",
       "avatar": {
         "skin": "#f2cdb4",
         "hair": "#eceff3",
@@ -75,7 +75,7 @@
       "pillar": "Customer & Long-term Bets",
       "brain": ".claude/skills/council/brains/bezos.md",
       "agent": "council-bezos",
-      "color": "#f472b6",
+      "color": "#C98E7A",
       "avatar": {
         "skin": "#eebe9c",
         "hair": "#6b5b50",
@@ -93,7 +93,7 @@
       "pillar": "Attention & Brand",
       "brain": ".claude/skills/council/brains/garyvee.md",
       "agent": "council-garyvee",
-      "color": "#a78bfa",
+      "color": "#A99BC0",
       "avatar": {
         "skin": "#e9bc96",
         "hair": "#231a15",

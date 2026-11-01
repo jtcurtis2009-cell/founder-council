@@ -7,49 +7,56 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
 <link rel="icon" href="/icon-192.png">
-<meta name="theme-color" content="#071a33">
+<meta name="theme-color" content="#0E1F22">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Council">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="room.css">
 </head>
 <body>
+<a class="sr-only" href="#stage">Skip to the debate</a>
 <header class="top">
-  <div class="brand"><span class="logo">◆</span> Founder Council</div>
-  <nav class="phases" id="phases">
-    <span data-phase="brief">Brief</span>
-    <span data-phase="Openings">Openings</span>
-    <span data-phase="Crossfire">Crossfire</span>
-    <span data-phase="Final vote">Vote</span>
-    <span data-phase="verdict">Verdict</span>
-  </nav>
-  <div class="controls">
-    <button id="newBtn" class="primary hidden" title="Start a new debate">＋ New debate</button>
-    <button id="facesBtn" class="hidden" title="Add 3D portrait images">🎭 Faces</button>
-    <button id="companyBtn" class="hidden" title="Edit your company profile">🏢 Company</button>
-    <button id="updateBtn" class="hidden" title="Download the latest version">⬇ Update</button>
-    <select id="sessionSelect" aria-label="Session"></select>
-    <button id="speedBtn" title="Playback speed">1×</button>
-    <button id="replayBtn" title="Replay from the start">↺ Replay</button>
-    <button id="skipBtn" title="Jump to the end">⏭ Skip</button>
+  <div class="brand"><span class="logo" aria-hidden="true">◆</span><span class="wordmark">Founder Council</span><span class="by">NOVIQ</span></div>
+  <label class="picker"><span>Debate</span><select id="sessionSelect" aria-label="Choose a debate"></select></label>
+  <button id="newBtn" class="btn primary hidden" title="Start a new debate"><span aria-hidden="true">＋</span><span class="lbl">New debate</span></button>
+  <div class="menu">
+    <button id="menuBtn" class="btn icon" aria-haspopup="menu" aria-expanded="false" aria-controls="menuList" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+    <div class="menu-list hidden" id="menuList" role="menu">
+      <button id="companyBtn" class="hidden" role="menuitem">Company profile<small>Numbers and goals every advisor reads</small></button>
+      <button id="facesBtn" class="hidden" role="menuitem">Faces<small>Add 3D portraits for each advisor</small></button>
+      <button id="updateBtn" class="hidden" role="menuitem">Check for updates<small>Download the latest version</small></button>
+    </div>
   </div>
 </header>
 
 <main>
-  <section class="stage">
+  <section class="stage" id="stage">
     <div class="title-row">
       <div><div class="company" id="company"></div><h1 id="title">Waiting for the Chair…</h1></div>
-      <div class="status" id="status"><span class="dot"></span><span id="statusText">idle</span></div>
+      <div class="status" id="status" role="status"><span class="dot"></span><span id="statusText">idle</span></div>
     </div>
+    <ol class="stepper" id="phases" aria-label="Debate progress">
+      <li data-phase="brief">Brief</li><li data-phase="Openings">Openings</li><li data-phase="Crossfire">Crossfire</li>
+      <li data-phase="Final vote">Vote</li><li data-phase="verdict">Verdict</li>
+    </ol>
+    <div class="playback" aria-label="Playback">
+      <button id="replayBtn" class="btn" title="Replay from the start">↺ Replay</button>
+      <button id="speedBtn" class="btn" title="Playback speed" aria-label="Playback speed">1×</button>
+      <button id="skipBtn" class="btn" title="Jump to the verdict"><span class="lbl">Jump to </span>verdict →</button>
+    </div>
+    <div class="sr-only" aria-live="polite" id="srLive"></div>
     <div class="table" id="table"></div>
     <div class="options" id="options"></div>
 
     <div class="speech" id="speech">
       <div class="speech-who" id="speechWho">The Chair</div>
-      <div class="speech-head" id="speechHead">Run <code>/council &lt;your decision&gt;</code> in Claude Code and the council convenes here.</div>
-      <div class="speech-body" id="speechBody"></div>
+      <div class="speech-head" id="speechHead">Bring the council a decision.</div>
+      <div class="speech-body" id="speechBody">Pick a past debate above, or start a new one with New debate.</div>
     </div>
 
     <div class="progress hidden" id="progress">
@@ -62,16 +69,16 @@
     <div class="verdict hidden" id="verdict"></div>
   </section>
 
-  <aside class="transcript">
-    <h2>Transcript</h2>
+  <details class="transcript" id="transcript" open>
+    <summary>Transcript</summary>
     <ol id="log"></ol>
-  </aside>
+  </details>
 </main>
 
 <dialog id="askDialog">
   <form id="askForm" method="dialog">
     <h2>New debate</h2>
-    <p class="hint">The council debates it on your Claude plan. Takes about 3–6 minutes, and the room switches to it automatically.</p>
+    <p class="hint">Five advisors debate it in three rounds and hand you a scored verdict. It takes about 3–6 minutes, and this page switches to the debate automatically.</p>
     <div class="modes" role="radiogroup" aria-label="Mode">
       <label class="mode"><input type="radio" name="mode" value="decision" checked><span><b>Decision</b> Pick between options</span></label>
       <label class="mode"><input type="radio" name="mode" value="plan"><span><b>Road to 2,000</b> Build a joint growth plan</span></label>
@@ -98,7 +105,7 @@
   <form id="companyForm" method="dialog">
     <h2>Company profile</h2>
     <p class="hint">The Chair and all five advisors read this before every debate. Update numbers, goals and constraints here, then click Save.</p>
-    <textarea name="text" rows="22" spellcheck="true" style="font-family: ui-monospace, Menlo, monospace; font-size: 13px;"></textarea>
+    <textarea name="text" rows="22" spellcheck="true" style="font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.55;"></textarea>
     <div class="ask-error hidden" id="companyError"></div>
     <div class="actions">
       <button type="button" id="companyCancel">Cancel</button>
