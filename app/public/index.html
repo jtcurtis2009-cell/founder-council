@@ -20,6 +20,7 @@
   </nav>
   <div class="controls">
     <button id="newBtn" class="primary hidden" title="Start a new debate">＋ New debate</button>
+    <button id="facesBtn" class="hidden" title="Add 3D portrait images">🎭 Faces</button>
     <button id="companyBtn" class="hidden" title="Edit your company profile">🏢 Company</button>
     <button id="updateBtn" class="hidden" title="Download the latest version">⬇ Update</button>
     <select id="sessionSelect" aria-label="Session"></select>
@@ -92,6 +93,13 @@
       <button type="submit" class="primary" id="companySave">Save</button>
     </div>
   </form>
+</dialog>
+
+<dialog id="facesDialog">
+  <h2>Faces</h2>
+  <p class="hint">Drag an image onto a box, or click a box to choose a file. <b>Main</b> is required. <b>Talking</b> (mouth open) and <b>Blink</b> (eyes closed) are optional and make the face animate. Square PNG or JPG works best.</p>
+  <div id="facesGrid" class="faces-grid"></div>
+  <div class="actions"><button type="button" id="facesClose" class="primary">Done</button></div>
 </dialog>
 
 <div class="toast hidden" id="toast"></div>

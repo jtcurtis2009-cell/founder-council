@@ -348,13 +348,56 @@
     finally { $('updateBtn').disabled = false; }
   };
 
+  // ---------- faces ----------
+  const fdlg = $('facesDialog');
+  const KINDS = [['base', 'Main', 'portrait'], ['talk', 'Talking', 'portraitTalk'], ['blink', 'Blink', 'portraitBlink']];
+  async function reloadRoster() {
+    S.roster = await (await fetch('/api/roster')).json();
+    S.roster.seats.forEach(s => { S.seatsById[s.id] = s; });
+  }
+  function renderFaces() {
+    $('facesGrid').innerHTML = S.roster.seats.map(seat => `<div class="face-row">
+      <div class="who"><b style="color:${seat.color}">${esc(seat.name)}</b><span>${esc(seat.pillar)}</span></div>
+      ${KINDS.map(([kind, label, field]) => `<label class="slot" data-seat="${esc(seat.id)}" data-kind="${kind}">
+        ${seat[field] ? `<img src="${esc(seat[field])}?v=${Date.now()}" alt=""><button type="button" class="x" title="Remove">✕</button>` : `${label}<br>drop image`}
+        <input type="file" accept="image/png,image/jpeg,image/webp"></label>`).join('')}
+    </div>`).join('');
+    $('facesGrid').querySelectorAll('.slot').forEach(slot => {
+      const upload = async file => {
+        if (!file) return;
+        const r = await fetch(`/api/portrait?seat=${slot.dataset.seat}&kind=${slot.dataset.kind}`, { method: 'POST', body: file });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) { toast(j.error || 'Upload failed.', 6000); return; }
+        await reloadRoster(); renderFaces(); refreshTable();
+      };
+      slot.querySelector('input').onchange = e => upload(e.target.files[0]);
+      slot.ondragover = e => { e.preventDefault(); slot.classList.add('drag'); };
+      slot.ondragleave = () => slot.classList.remove('drag');
+      slot.ondrop = e => { e.preventDefault(); slot.classList.remove('drag'); upload(e.dataTransfer.files[0]); };
+      const x = slot.querySelector('.x');
+      if (x) x.onclick = async e => {
+        e.preventDefault(); e.stopPropagation();
+        await fetch(`/api/portrait?seat=${slot.dataset.seat}&kind=${slot.dataset.kind}`, { method: 'DELETE' });
+        await reloadRoster(); renderFaces(); refreshTable();
+      };
+    });
+  }
+  function refreshTable() {
+    const ids = [...document.querySelectorAll('.seat')].map(el => el.id.replace('seat-', ''));
+    const badges = Object.fromEntries(ids.map(id => [id, ($('badge-' + id) || {}).innerHTML || '']));
+    renderTable(ids.length ? ids : S.roster.default_board);
+    ids.forEach(id => { if ($('badge-' + id)) $('badge-' + id).innerHTML = badges[id]; });
+  }
+  $('facesBtn').onclick = async () => { await reloadRoster(); renderFaces(); fdlg.showModal(); };
+  $('facesClose').onclick = () => fdlg.close();
+
   // ---------- boot ----------
   (async function boot() {
     S.roster = await (await fetch('/api/roster')).json();
     S.roster.seats.forEach(s => { S.seatsById[s.id] = s; });
     if (S.roster.disclaimer) $('disclaimer').textContent = S.roster.disclaimer;
     if (S.roster.company) $('company').textContent = S.roster.company;
-    try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); if (h.manage) { $('companyBtn').classList.remove('hidden'); $('updateBtn').classList.remove('hidden'); } } catch {}
+    try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); if (h.manage) { $('facesBtn').classList.remove('hidden'); $('companyBtn').classList.remove('hidden'); $('updateBtn').classList.remove('hidden'); } } catch {}
     try { const j = await (await fetch('/api/job')).json(); if (j.status === 'running') watchJob(); } catch {}
     renderTable(S.roster.default_board);
     const list = await refreshList();

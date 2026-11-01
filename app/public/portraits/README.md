@@ -1,33 +1,28 @@
-# Portraits
+# Portraits (3D faces)
 
-Put an image here named after a seat id and the room uses it in place of the drawn face, no restart needed (just refresh the page):
-
-| File | Purpose |
-|---|---|
-| `hormozi.png` | Main portrait. **Required.** `.png`, `.jpg`, `.jpeg` or `.webp` all work. |
-| `hormozi-talk.png` | Optional. Same image with the **mouth open**, used to animate speaking. |
-| `hormozi-blink.png` | Optional. Same image with the **eyes closed**, used to blink. |
+The easiest way to add images: in the room, click **🎭 Faces** and drag each image onto its box. Images are saved in this folder as `<seat>.png`, `<seat>-talk.png` and `<seat>-blink.png`. They stay on your computer and are never uploaded to GitHub.
 
 Seat ids: `martell`, `hormozi`, `buffett`, `bezos`, `garyvee`.
 
-Without the talk frame, the portrait does a subtle head-bob while that advisor speaks.
+## Making the images (ChatGPT or any image generator)
 
-**Image tips:** square (1024×1024 is ideal), head and shoulders, face centered in the upper half, plain dark or transparent background. The room crops it to a circle.
+**1. Style message:** send this first, in a new chat:
 
-## Generating the 3D style
+> I'm making a matching set of 5 stylized 3D animated character portraits for a private business-advisor app. Use one identical style for all of them: a modern 3D animated feature-film look, soft studio lighting with a warm key light and a subtle rim light, smooth stylized skin, slightly exaggerated friendly proportions (larger eyes and head), head-and-shoulders framing, facing the camera, face centered in the upper half, plain dark navy blue background, square 1:1, high detail. Confirm and wait for the first character.
 
-Use any image generator (ChatGPT, Midjourney, Ideogram, etc.). Upload a public photo of the person as a reference, then use this prompt with the description filled in:
+**2. One message per character** (add a reference photo of the person if your tool allows it):
 
-> Stylized 3D animated character portrait in the style of a modern Pixar/DreamWorks film, of the man in the reference photo. Keep his likeness: face shape, hairstyle, facial hair, skin tone. Head-and-shoulders, facing the camera, friendly confident smile, soft studio lighting with warm key light and subtle rim light, smooth subsurface-scattered skin, slightly exaggerated proportions (bigger eyes, larger head). Plain dark navy background. Square 1:1, high detail. Wearing: **[OUTFIT]**.
+1. A man in his 40s with short dark brown hair, a light beard and stubble, and a confident smile, wearing a black crew-neck t-shirt. *(Dan Martell)*
+2. A muscular man in his 30s with long dark wavy shoulder-length hair, a full thick dark beard and a big grin, wearing a grey trucker cap backwards and a purple-blue plaid flannel shirt over a cream t-shirt. *(Alex Hormozi)*
+3. A kind elderly man in his 90s with white side-parted hair, bushy white eyebrows and thick dark-rimmed glasses, wearing a navy suit, white shirt and red tie, with a warm grandfatherly smile. *(Warren Buffett)*
+4. A bald man in his 60s with a big joyful laugh and bright eyes, wearing a navy blazer over a light-blue open-collar shirt. *(Jeff Bezos)*
+5. An energetic man in his 40s with short dark hair, dark stubble and an intense, passionate expression, wearing a black hoodie. *(Gary Vee)*
 
-Outfits that match each person's public look:
+**3. Animation frames** (optional, per character), in the same chat:
+- "Same image, identical in every way, but with the mouth open mid-word." → **Talking** box
+- "Same image, identical in every way, but with the eyes closed." → **Blink** box
 
-- **martell**: black crew-neck t-shirt
-- **hormozi**: backwards grey trucker cap, long dark wavy hair, full beard, purple-blue plaid flannel over a cream t-shirt
-- **buffett**: navy suit, white shirt, red tie, thick dark-rimmed glasses, white hair
-- **bezos**: navy blazer over a light blue open-collar shirt, bald, big laugh
-- **garyvee**: black t-shirt or hoodie, short dark hair, stubble
-
-Then, for the talking and blinking frames, ask the same chat: *"Same image, identical in every way, but with the mouth open mid-word"*, and then *"…but with the eyes closed"*. Save them as `<id>-talk.png` and `<id>-blink.png`.
-
-The room's footer already says these are simulated advisors. Keep that disclaimer if you share screenshots or videos.
+**Tips**
+- If the tool refuses to use a real person's name or photo, use the description only, as written above.
+- Download each image (PNG or JPG), then drag it into **🎭 Faces**.
+- Keep the **"simulated advisors"** disclaimer if you share screenshots or videos.

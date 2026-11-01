@@ -136,6 +136,32 @@ async function update(res) {
   if (changed) { console.log('  ⬇ Updated:\n' + log); setTimeout(() => process.exit(75), 400); }
 }
 
+// ---------- Faces: upload portrait images from the browser ----------
+const PORTRAITS = path.join(__dirname, 'public', 'portraits');
+function imageExt(buf) {
+  if (buf.length > 8 && buf.slice(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'png';
+  if (buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'jpg';
+  if (buf.length > 12 && buf.slice(0, 4).toString() === 'RIFF' && buf.slice(8, 12).toString() === 'WEBP') return 'webp';
+  return null;
+}
+function readRaw(req, limit) {
+  return new Promise((resolve, reject) => {
+    const chunks = []; let n = 0;
+    req.on('data', c => { n += c.length; if (n > limit) { reject(new Error('too large')); req.destroy(); } else chunks.push(c); });
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+function portraitTarget(url) {
+  const seat = url.searchParams.get('seat') || '', kind = url.searchParams.get('kind') || 'base';
+  const roster = readJSON(ROSTER, { seats: [] });
+  if (!roster.seats.some(s => s.id === seat) || !['base', 'talk', 'blink'].includes(kind)) return null;
+  return kind === 'base' ? seat : `${seat}-${kind}`;
+}
+function removePortrait(name) {
+  for (const ext of ['png', 'jpg', 'jpeg', 'webp']) { try { fs.unlinkSync(path.join(PORTRAITS, `${name}.${ext}`)); } catch {} }
+}
+
 http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
   const p = decodeURIComponent(url.pathname);
@@ -143,6 +169,19 @@ http.createServer((req, res) => {
   if (p === '/api/health') return send(res, 200, { ok: true, ask: true, manage: true });
   if (p === '/api/job') return send(res, 200, jobStatus());
   if (p === '/api/update' && req.method === 'POST') return update(res);
+  if (p === '/api/portrait' && (req.method === 'POST' || req.method === 'DELETE')) {
+    const name = portraitTarget(url);
+    if (!name) return send(res, 400, { error: 'Unknown advisor or frame.' });
+    if (req.method === 'DELETE') { removePortrait(name); return send(res, 200, { ok: true }); }
+    return readRaw(req, 10 * 1024 * 1024).then(buf => {
+      const ext = imageExt(buf);
+      if (!ext) return send(res, 400, { error: 'Please use a PNG, JPG or WebP image.' });
+      fs.mkdirSync(PORTRAITS, { recursive: true });
+      removePortrait(name);
+      fs.writeFileSync(path.join(PORTRAITS, `${name}.${ext}`), buf);
+      send(res, 200, { ok: true });
+    }).catch(() => send(res, 413, { error: 'Image is too large (max 10 MB).' }));
+  }
   if (p === '/api/company' && req.method === 'GET') {
     try { return send(res, 200, { text: fs.readFileSync(COMPANY, 'utf8') }); } catch { return send(res, 200, { text: '' }); }
   }
