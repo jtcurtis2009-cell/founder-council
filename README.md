@@ -39,10 +39,11 @@ You do this once on a Mac or Windows computer. It doesn't run inside the Claude 
    ```
 3. **Download this project** in the same Terminal window:
    ```bash
-   git clone -b claude/eager-bell-hlfzv4 https://github.com/jtcurtis2009-cell/Salesforce-BOT-.git founder-council
+   git clone https://github.com/jtcurtis2009-cell/founder-council.git
    cd founder-council
    ```
-   (No git? On GitHub, switch to the `claude/eager-bell-hlfzv4` branch, click **Code → Download ZIP**, unzip it, and `cd` into the folder.)
+   (No git? Go to https://github.com/jtcurtis2009-cell/founder-council, click **Code → Download ZIP**, unzip it, and `cd` into the folder.)
+   If `npm install -g` fails with `EACCES`, put `sudo` in front of it and enter your Mac password.
 4. **Start the room**:
    ```bash
    npm start
