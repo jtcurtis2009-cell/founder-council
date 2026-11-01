@@ -18,11 +18,12 @@ Seat ids: `martell`, `hormozi`, `buffett`, `bezos`, `garyvee`.
 4. A bald man in his 60s with a big joyful laugh and bright eyes, wearing a navy blazer over a light-blue open-collar shirt. *(Jeff Bezos)*
 5. An energetic man in his 40s with short dark hair, dark stubble and an intense, passionate expression, wearing a black hoodie. *(Gary Vee)*
 
-**3. Animation frames** (optional, per character), in the same chat:
+**3. Animation frames** (optional). Without them, the room animates the chin area automatically while that advisor speaks. For a more realistic mouth, ask in the same chat:
 - "Same image, identical in every way, but with the mouth open mid-word." → **Talking** box
 - "Same image, identical in every way, but with the eyes closed." → **Blink** box
 
 **Tips**
+- Talking and Blink images must be the *same picture* as Main with only the mouth or eyes changed. A different pose or background makes the head jump when the frames swap.
 - If the tool refuses to use a real person's name or photo, use the description only, as written above.
 - Download each image (PNG or JPG), then drag it into **🎭 Faces**.
 - Keep the **"simulated advisors"** disclaimer if you share screenshots or videos.
