@@ -62,6 +62,7 @@ const shim = `window.__COUNCIL__ = ${JSON.stringify(data).replace(/</g, '\\u003c
 let html = read(path.join(PUB, 'index.html'))
   .replace('<link rel="stylesheet" href="room.css">', `<style>\n${read(path.join(PUB, 'room.css'))}\n</style>`)
   .replace('<script src="avatar.js"></script>', `<script>\n${shim}\n</script>\n<script>\n${read(path.join(PUB, 'avatar.js'))}\n</script>`)
+  .replace('<script src="lip.js"></script>', `<script>\n${read(path.join(PUB, 'lip.js'))}\n</script>`)
   .replace('<script src="room.js"></script>', `<script>\n${read(path.join(PUB, 'room.js')).replace(/<\/script/g, '<\\/script')}\n</script>`);
 
 const out = path.join(ROOT, only ? `founder-council-${only}.html` : 'founder-council.html');

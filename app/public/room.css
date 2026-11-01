@@ -57,9 +57,10 @@ h1 { font-size: clamp(20px, 3vw, 30px); margin: 4px 0 8px; font-weight: 800; }
 .avatar { width: 100%; height: 100%; display: block; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #2c5ea8, #0d2a52); }
 .avatar .eyes { transform-origin: 100px 92px; animation: blink 5s infinite; animation-delay: var(--blink, 0s); }
 @keyframes blink { 0%, 95%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
-.avatar .mouth-open { opacity: 0; }
-.seat.speaking .mouth-open { animation: talk .26s steps(1) infinite; }
-.seat.speaking .mouth-closed { animation: talk .26s steps(1) infinite reverse; }
+.avatar .mouth-open { opacity: min(1, calc(var(--open, 0) * 3)); transform-box: view-box; transform-origin: 100px 128px;
+  transform: scaleY(calc(.25 + var(--open, 0) * .85)); }
+.avatar .mouth-closed { opacity: max(0, calc(1 - var(--open, 0) * 3)); }
+.avatar { will-change: transform; }
 @keyframes talk { 0% { opacity: 1; } 50% { opacity: 0; } }
 .seat.speaking .brow { animation: browUp 1.3s ease-in-out infinite; }
 @keyframes browUp { 50% { transform: translateY(-2px); } }
@@ -98,18 +99,13 @@ h1 { font-size: clamp(20px, 3vw, 30px); margin: 4px 0 8px; font-weight: 800; }
 .face:first-child { margin-left: 0; }
 .face svg, .face .avatar { width: 100%; height: 100%; display: block; }
 /* portrait mode */
+.avatar.photo .lipcanvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
 .avatar.photo { position: relative; overflow: hidden; }
 .avatar.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; user-select: none; }
 .avatar.photo .talk, .avatar.photo .blinkf { opacity: 0; }
 .avatar.photo .blinkf { animation: blinkFrame 5s infinite; animation-delay: var(--blink, 0s); }
 @keyframes blinkFrame { 0%, 95%, 100% { opacity: 0; } 96%, 98% { opacity: 1; } }
-.seat.speaking .avatar.photo .talk { animation: talk .24s steps(1) infinite; }
-.seat.speaking .avatar.photo:not(.has-talk) .base { animation: speakBob .9s ease-in-out infinite alternate; transform-origin: 50% 85%; }
-/* automatic talking for portraits without a talk frame: the chin area drops and rises like a jaw */
-.avatar.photo .jaw { clip-path: ellipse(15% 10% at var(--mx) calc(var(--my) + 6%)); opacity: 0; }
-.seat.speaking .avatar.photo .jaw { opacity: 1; animation: jaw .32s ease-in-out infinite alternate, speakBob .9s ease-in-out infinite alternate; }
-@keyframes jaw { 0% { translate: 0 0; } 30% { translate: 0 0; } 100% { translate: 0 3.2%; } }
-@keyframes speakBob { from { transform: scale(1) rotate(-.6deg); } to { transform: scale(1.035) rotate(.6deg) translateY(-1.5%); } }
+.avatar.photo .talk { opacity: min(1, calc(var(--open, 0) * 2)) !important; }
 @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } }
 
 .verdict { margin-top: 18px; padding: 20px; border-color: rgba(74,222,128,.45); animation: slideIn .6s; }

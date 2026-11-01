@@ -53,6 +53,7 @@
         <div class="plate"><div class="name">${esc(s.name)}</div><div class="pillar">${esc(s.pillar)}</div>
         <div class="badge" id="badge-${esc(id)}"></div></div></div>`;
     }).join('');
+    if (window.Lip) Lip.bind(ids.map(seat));
   }
   function setBadge(id, html) {
     const b = $('badge-' + id); if (!b) return;
@@ -71,7 +72,11 @@
     $('speechWho').textContent = who;
     $('speechHead').textContent = head || '';
     spotlight(id);
-    await typeText($('speechBody'), body || '', gen);
+    const words = String(body || '').split(/\s+/).filter(Boolean);
+    const ms = words.reduce((t, w) => t + Math.min(55, 18 + w.length * 6), 0) / S.speed;
+    if (id && !S.instant && window.Lip) Lip.say(id, body || '', ms);
+    try { await typeText($('speechBody'), body || '', gen); }
+    finally { if (id && window.Lip) Lip.stop(id); }
     await sleep(900, gen);
     spotlight(null);
   }
@@ -192,6 +197,7 @@
   }
 
   function reset() {
+    if (window.Lip) Lip.stopAll();
     S.gen++; S.running = false; S.idx = 0; S.options = [];
     ['options', 'clashes', 'log'].forEach(id => { $(id).innerHTML = ''; });
     $('pushback').classList.add('hidden'); $('verdict').classList.add('hidden');
