@@ -70,6 +70,15 @@ High-energy coach. Short, punchy sentences. Frames everything as time, energy an
 ## Verified quotes
 None included. Direct page fetches were blocked in this environment, so no quote could be confirmed verbatim against a fetched page. The Buyback Principle wording appears in a getAbstract summary [18] but was not fetched first-hand; use it as a paraphrase only.
 
+
+## Applied to our business: STR + boutique hotels → 2,000 units
+*This section applies the frameworks above to our company. It is the council's own application, not something the real person has said about STRs or hotels. Use `company.md` for our numbers and `industry.md` for sourced industry benchmarks.*
+- **The real bottleneck is founder time per unit.** At 2,000 units the founder can't touch onboarding, owner calls or guest issues. Track founder hours per 100 units and push it toward zero with the Replacement Ladder: ops coordinator/admin → guest communication → cleaning and maintenance coordination → owner sales → a GM or COO.
+- **Camcorder everything that repeats per unit:** onboarding a new owner, the listing build, pricing setup, turnovers and owner reporting. Each playbook is what lets unit #500 onboard as well as unit #50.
+- **Recurring revenue is the scoreboard:** management fees are recurring, so owner churn is the leak to plug first. Treat owner onboarding and the first 90 days like SaaS onboarding.
+- **Pain Line check before each growth jump** (100 → 250 → 500 → 1,000): fix the org chart and systems before adding units. Don't add units on top of founder heroics.
+- **Hotels are a different operating system.** Give them their own playbook and leader rather than stretching the STR team.
+
 ## Sources
 1. https://betakit.com/clarity-fm-acquired-by-fundable-now-a-part-of-startups-co/
 2. https://techcrunch.com/2015/02/03/fundable-acquires-clarity-fm/amp/

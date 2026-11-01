@@ -30,7 +30,7 @@
 <main>
   <section class="stage">
     <div class="title-row">
-      <h1 id="title">Waiting for the Chair…</h1>
+      <div><div class="company" id="company"></div><h1 id="title">Waiting for the Chair…</h1></div>
       <div class="status" id="status"><span class="dot"></span><span id="statusText">idle</span></div>
     </div>
     <div class="table" id="table"></div>
@@ -57,6 +57,10 @@
   <form id="askForm" method="dialog">
     <h2>New debate</h2>
     <p class="hint">The council debates it on your Claude plan. Takes about 3–6 minutes, and the room switches to it automatically.</p>
+    <div class="modes" role="radiogroup" aria-label="Mode">
+      <label class="mode"><input type="radio" name="mode" value="decision" checked><span><b>Decision</b> Pick between options</span></label>
+      <label class="mode"><input type="radio" name="mode" value="plan"><span><b>Road to 2,000</b> Build a joint growth plan</span></label>
+    </div>
     <label>Your decision or question <span class="req">*</span>
       <textarea name="question" rows="3" required minlength="10" placeholder="Should I hire a full-time sales rep or put the money into paid ads?"></textarea></label>
     <label>Options <span class="sub">(one per line; leave blank and the Chair proposes some)</span>

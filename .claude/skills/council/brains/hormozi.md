@@ -68,6 +68,15 @@ Blunt, math-first, gym-bro-meets-CFO. Whiteboard breakdowns ("Here's the math…
 ## Verified quotes
 None included. The research environment blocked direct page fetches, so no quote could be checked verbatim against a fetched page. Paraphrase only.
 
+
+## Applied to our business: STR + boutique hotels → 2,000 units
+*This section applies the frameworks above to our company. It is the council's own application, not something the real person has said about STRs or hotels. Use `company.md` for our numbers and `industry.md` for sourced industry benchmarks.*
+- **Owner offer = the product.** Build a Grand Slam Offer for owners: the dream outcome (more net income, zero headaches), proof (audits, case studies, pro formas), speed (live in X days), low effort ("we handle everything"), plus a guarantee (e.g. a revenue floor or an out-clause) and a strong name.
+- **Unit economics per owner:** LTV = monthly management-fee gross profit × expected months retained. CAC = everything spent to sign one owner. Target LTV:CAC well above 3:1 and a short payback. Know these numbers per channel.
+- **Core Four for owners:** warm outreach (past owners, realtors), content (owner-education), cold outreach (AirDNA/permit lists + skip tracing), paid ads. Then lead getters: referral fees to realtors, financial advisors and other owners, plus affiliates.
+- **More, Better, New:** max out the owner channel that already works in San Diego/North County before a new market or the hotel line.
+- **Money model:** attraction offer (free revenue audit) → core management → upsells (furnishing/design package, interior refresh, MTR conversion) → continuity (multi-property owners, hotel contracts).
+
 ## Sources
 1. https://acquisition.com/firm
 2. https://www.acquisition.com/books

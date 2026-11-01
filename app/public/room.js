@@ -100,7 +100,8 @@
     async opening(e, gen) {
       const s = seat(e.seat);
       setBadge(e.seat, `${esc(e.stance)} <span class="pick">${esc(e.pick)}</span>`);
-      log(`<b>${esc(s.name)}</b> · ${esc(e.stance)} ${esc(e.pick)}: ${esc(e.headline)}`, s.color);
+      log(`<b>${esc(s.name)}</b> · ${esc(e.stance)} ${esc(e.pick)}: ${esc(e.headline)}` +
+        ((e.moves || []).length ? `<ul style="margin:4px 0 0;padding-left:16px">${e.moves.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : ''), s.color);
       await speak(e.seat, `${s.name} · ${e.weighing || s.pillar}`, e.headline, e.speech, gen);
     },
     async pushback(e, gen) {
@@ -144,6 +145,15 @@
         <div class="bars">${keys.map(k => `<div class="bar ${k === e.winner ? 'win' : ''}">
           <span><b>${esc(k)}</b> ${esc(optLabel(k))}${(e.capped || []).includes(k) ? '<span class="cap">ruin cap</span>' : ''}</span>
           <span class="track"><span class="fill" data-w="${Number(scores[k]) * 10}"></span></span><b>${esc(scores[k])}</b></div>`).join('')}</div>
+        ${e.allocation ? (() => { const cols = ['#60a5fa', '#4ade80', '#f59e0b', '#f472b6', '#a78bfa'];
+          const ks = Object.keys(e.allocation);
+          return `<div class="cols"><div style="grid-column:1/-1"><h3>Where the effort goes</h3>
+            <div class="alloc">${ks.map((k, i) => `<span style="width:${Number(e.allocation[k])}%;background:${cols[i % 5]}">${Number(e.allocation[k]) >= 8 ? esc(k) + ' ' + esc(e.allocation[k]) + '%' : ''}</span>`).join('')}</div>
+            <div class="alloc-legend">${ks.map((k, i) => `<span><b style="color:${cols[i % 5]}">■ ${esc(k)}</b> ${esc(optLabel(k))} · ${esc(e.allocation[k])}%</span>`).join('')}</div></div></div>`; })() : ''}
+        ${(e.roadmap || []).length ? `<div class="cols"><div style="grid-column:1/-1"><h3>Roadmap</h3><div class="roadmap">${e.roadmap.map(m =>
+          `<div class="milestone"><div class="when"><b>${esc(m.milestone)}</b><span>${esc(m.by)}</span></div><div>
+            <div class="focus">${esc(m.focus)}</div><ul>${(m.moves || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+            ${(m.kpis || []).length ? `<div class="kpis">KPIs: ${m.kpis.map(esc).join(' · ')}</div>` : ''}</div></div>`).join('')}</div></div></div>` : ''}
         ${(e.analysis || []).length ? `<div class="cols"><div style="grid-column:1/-1"><h3>Option-by-option analysis</h3><div class="analysis">${e.analysis.map(a =>
           `<div class="item"><b>${esc(a.option)}: ${esc(optLabel(a.option))}</b><span class="pro">▲ ${esc(a.for)}</span><span class="con">▼ ${esc(a.against)}</span></div>`).join('')}</div></div></div>` : ''}
         ${e.risks && e.risks.length ? `<div class="cols"><div style="grid-column:1/-1"><h3>Biggest risks</h3><ul>${e.risks.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div></div>` : ''}
@@ -260,11 +270,19 @@
   function showAskError(msg) { $('askError').textContent = msg; $('askError').classList.toggle('hidden', !msg); }
   $('newBtn').onclick = () => { showAskError(''); dlg.showModal(); form.question.focus(); };
   $('askCancel').onclick = () => dlg.close();
+  const PLAN_Q = 'Build our plan to reach 2,000 units across boutique hotels and short-term rentals.';
+  form.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => {
+    const plan = form.mode.value === 'plan';
+    if (plan && !form.question.value.trim()) form.question.value = PLAN_Q;
+    if (!plan && form.question.value === PLAN_Q) form.question.value = '';
+    form.options.placeholder = plan ? 'Leave blank: the Chair proposes growth paths (organic, acquisitions, hotels, new markets)'
+      : 'Hire a rep at $80k/yr\nSpend $80k on ads\nDo both at half size';
+  }));
   form.addEventListener('submit', async ev => {
     ev.preventDefault();
     const body = {
       question: form.question.value, options: form.options.value.split('\n'),
-      context: form.context.value, lean: form.lean.value, quick: form.quick.checked,
+      context: form.context.value, lean: form.lean.value, quick: form.quick.checked, mode: form.mode.value,
     };
     $('askSubmit').disabled = true; showAskError('');
     try {
@@ -302,6 +320,7 @@
     S.roster = await (await fetch('/api/roster')).json();
     S.roster.seats.forEach(s => { S.seatsById[s.id] = s; });
     if (S.roster.disclaimer) $('disclaimer').textContent = S.roster.disclaimer;
+    if (S.roster.company) $('company').textContent = S.roster.company;
     try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); } catch {}
     try { const j = await (await fetch('/api/job')).json(); if (j.status === 'running') watchJob(); } catch {}
     renderTable(S.roster.default_board);

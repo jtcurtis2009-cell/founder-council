@@ -68,6 +68,15 @@ Calm, analytical, frequently laughs. Speaks in mechanisms, doors, flywheels and 
 ## Verified quotes
 None included. No source page with verbatim text could be fetched in this build: aboutamazon.com and sec.gov were blocked by the network. Per the no-fabrication rule, quotes are left out. Paraphrase only, and cite the letter.
 
+
+## Applied to our business: STR + boutique hotels → 2,000 units
+*This section applies the frameworks above to our company. It is the council's own application, not something the real person has said about STRs or hotels. Use `company.md` for our numbers and `industry.md` for sourced industry benchmarks.*
+- **Two customers: owners and guests.** Work backwards from both: write the owner press release ("NOVIQ owners earned more and never lifted a finger") and the guest one ("boutique-hotel service in a home").
+- **Flywheel:** more units → more pricing and demand data + better vendor rates + stronger direct-booking brand → better owner returns and guest experience → more owners and referrals → more units.
+- **What won't change:** owners always want higher net income, transparency and no headaches; guests always want clean, consistent, well-located stays. Build on those.
+- **Doors:** a new pricing tool or listing playbook is a two-way door, so move fast. A 10-year hotel lease or acquiring a PM company is a one-way door, so slow down and write the six-pager.
+- **Platform play:** proprietary owner reporting, pricing and ops tooling turn into the moat at 2,000 units. Measure the outputs (owner net income, review scores, retention), not the proxies.
+
 ## Sources
 1. https://www.aboutamazon.com/news/company-news/amazons-original-1997-letter-to-shareholders
 2. https://www.theregister.com/2021/02/03/amazon_fy2020_results/ (and Amazon FY2020 10-K: https://www.sec.gov/Archives/edgar/data/1018724/000101872421000004/amzn-20201231.htm)

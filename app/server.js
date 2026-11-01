@@ -45,7 +45,7 @@ function listSessions() {
 const CLAUDE_BIN = process.env.CLAUDE_BIN || 'claude';
 const ALLOWED_TOOLS = [
   'Read', 'Write', 'Agent', 'Task', 'Skill',
-  'Bash(node app/log.js:*)', 'Bash(node app/export.js:*)', 'Bash(curl -s localhost:*)', 'Bash(curl -s http://localhost:*)',
+  'Bash(node app/log.js:*)', 'Bash(node app/export.js:*)',
 ];
 let job = null; // { status: 'running'|'done'|'failed', started, finished, log, title }
 
@@ -59,7 +59,7 @@ function readBody(req, limit = 20000) {
 }
 
 function buildPrompt(q) {
-  const lines = [`/council ${q.quick ? '--quick ' : ''}${q.question.trim()}`];
+  const lines = [`/council ${q.mode === 'plan' ? 'plan ' : ''}${q.quick ? '--quick ' : ''}${q.question.trim()}`];
   const opts = (q.options || []).map(o => String(o).trim()).filter(Boolean);
   if (opts.length) lines.push('', 'Options:', ...opts.map((o, i) => `${String.fromCharCode(65 + i)}. ${o}`));
   else lines.push('', 'Options: none given. Propose 2-4 concrete options yourself.');

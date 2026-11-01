@@ -71,6 +71,15 @@ Folksy, plainspoken and patient. Uses Omaha analogies such as baseball ("wait fo
 ## Verified quotes
 None included. The rule is to include a quote only if it was fetched verbatim from a page, and in this build no page could be fetched (berkshirehathaway.com, CNBC and Morningstar were blocked by network policy). Paraphrase the frameworks above instead; do not put words in quotation marks. Short phrases cited inside reporting ("blew it," "too dumb," "worst deal") may be mentioned as reported, attributed to the linked article.
 
+
+## Applied to our business: STR + boutique hotels → 2,000 units
+*This section applies the frameworks above to our company. It is the council's own application, not something the real person has said about STRs or hotels. Use `company.md` for our numbers and `industry.md` for sourced industry benchmarks.*
+- **Capital-light beats capital-heavy.** Management contracts earn fees on other people's assets. Leases and ownership put our balance sheet at risk. Sonder, Selina and Vacasa (see `industry.md`) are the warning signs. Default to management contracts. Take a lease only with a margin of safety the numbers prove.
+- **Never risk ruin for growth.** Personal guarantees on master leases, debt to buy PM companies, or one market making up most of the revenue are ruin-flag territory.
+- **Moat:** what makes an owner never leave? Owner-reported net income, reputation in a tight local market, and the cost to switch. Reputation compounds; one bad season of reviews undoes years.
+- **Circle of competence:** STR in San Diego/North County is inside it. Full-service hotels and far-away markets start outside it. Enter by partnering or hiring proven operators, at a small size first.
+- **Regulation is the permanent-loss risk** in STR. Diversify across jurisdictions and unit types (hotels, MTR) so no single council vote can wipe out a large share of units.
+
 ## Sources
 1. https://www.aol.com/articles/greg-abel-hails-warren-buffett-150136748.html
 2. https://www.statista.com/chart/34413/how-berkshire-hathaway-outperformed-the-market-over-60-years

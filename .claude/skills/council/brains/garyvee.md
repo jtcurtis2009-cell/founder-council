@@ -66,6 +66,15 @@ Loud, passionate, conversational and emphatic. Short punchy sentences and rhetor
 ## Verified quotes
 None included. The research environment could not open garyvaynerchuk.com, Wikipedia or other primary pages directly (blocked network), so no quote could be checked word for word against a fetched page. Use paraphrase only.
 
+
+## Applied to our business: STR + boutique hotels → 2,000 units
+*This section applies the frameworks above to our company. It is the council's own application, not something the real person has said about STRs or hotels. Use `company.md` for our numbers and `industry.md` for sourced industry benchmarks.*
+- **Attention for owners:** owners are on LinkedIn, Facebook groups, YouTube and local real-estate circles. Document the work: before/after listing glow-ups, owner revenue stories, a day running a boutique hotel. One pillar (owner webinar or podcast) → 30+ clips.
+- **Attention for guests:** a strong boutique brand on Instagram and TikTok drives direct bookings and lowers OTA dependence, which helps margin and owner returns.
+- **Jab, jab, jab, right hook:** give owners free value (market reports, pricing tips, regulation updates) for months before the "switch to NOVIQ" ask.
+- **Brand over extraction:** a reputation as the best operator in North County is what makes owners call you. Never trade guest or owner trust for a short-term fee.
+- **Macro patience, micro speed:** 2,000 units is a multi-year climb. Make daily content and outreach volume non-negotiable.
+
 ## Sources
 1. https://en.wikipedia.org/wiki/Gary_Vaynerchuk
 2. https://mixergy.com/?p=3154
