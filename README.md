@@ -49,8 +49,8 @@ You do this once on a Mac or Windows computer. It doesn't run inside the Claude 
    npm start
    ```
    Then open http://localhost:4730 in your browser. The example debate plays. Leave this window open.
-5. **Open a second Terminal window**, `cd` into the same folder, and run `claude`. Sign in when asked.
-6. Type `/council` followed by your decision (see the example below) and watch the room.
+5. **Run `claude` once** in a second Terminal window and sign in (only needed the first time), then close it.
+6. In the room, click **＋ New debate**, type your decision, options and numbers, and click **Convene the council**. The room runs Claude Code in the background on your Claude plan and switches to the debate automatically. You can also type `/council <your decision>` inside Claude Code yourself.
 
 **Just want to look at it?** Open `founder-council.html` (created by `npm run export`) in any browser. That one file has the whole room and every saved debate, and needs nothing installed.
 
@@ -122,8 +122,11 @@ app/public/                         room UI: index.html, room.css, room.js, avat
 sessions/                           your councils (git-ignored) + one example
 ```
 
+## Realistic portraits
+Drop images into `app/public/portraits/` named after a seat (`hormozi.png`, `buffett.jpg`, …) and refresh the page. The room uses them in place of the drawn faces. Add `<id>-talk.png` (mouth open) and `<id>-blink.png` (eyes closed) frames for talking and blinking animation. See `app/public/portraits/README.md` for an image-generator prompt that produces the 3D animated style. Portrait images are git-ignored so they stay on your machine.
+
 ## Differences from the video's version
-- The avatars are drawn in code as SVG cartoons that blink and talk. They are not generated from photos. To use real cartoon portraits, add an `image` field per seat and render it in `avatar.js`.
+- Without portraits, the avatars are shaded SVG drawings that blink and talk.
 - The PDF comes from the browser's print dialog, so no PDF library is needed.
 
 ## License

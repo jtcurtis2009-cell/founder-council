@@ -7,3 +7,6 @@ sessions/*
 
 # exported single-file rooms
 founder-council*.html
+# portrait images stay on your machine (likenesses and image rights); the README in that folder is committed
+app/public/portraits/*
+!app/public/portraits/README.md

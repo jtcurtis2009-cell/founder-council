@@ -19,6 +19,7 @@
     <span data-phase="verdict">Verdict</span>
   </nav>
   <div class="controls">
+    <button id="newBtn" class="primary hidden" title="Start a new debate">＋ New debate</button>
     <select id="sessionSelect" aria-label="Session"></select>
     <button id="speedBtn" title="Playback speed">1×</button>
     <button id="replayBtn" title="Replay from the start">↺ Replay</button>
@@ -51,6 +52,28 @@
     <ol id="log"></ol>
   </aside>
 </main>
+
+<dialog id="askDialog">
+  <form id="askForm" method="dialog">
+    <h2>New debate</h2>
+    <p class="hint">The council debates it on your Claude plan. Takes about 3–6 minutes, and the room switches to it automatically.</p>
+    <label>Your decision or question <span class="req">*</span>
+      <textarea name="question" rows="3" required minlength="10" placeholder="Should I hire a full-time sales rep or put the money into paid ads?"></textarea></label>
+    <label>Options <span class="sub">(one per line; leave blank and the Chair proposes some)</span>
+      <textarea name="options" rows="3" placeholder="Hire a sales rep at $80k/yr&#10;Spend $80k on Meta + Google ads&#10;Do both at half size"></textarea></label>
+    <label>Context &amp; numbers <span class="sub">(revenue, cash, team, timeline, constraints)</span>
+      <textarea name="context" rows="3" placeholder="$40k/month revenue, $150k cash, team of 3, need a decision by March"></textarea></label>
+    <div class="row">
+      <label>Leaning toward <span class="sub">(optional)</span><input name="lean" placeholder="Ads"></label>
+      <label class="check"><input type="checkbox" name="quick"> Quick mode <span class="sub">(skips Crossfire, faster)</span></label>
+    </div>
+    <div class="ask-error hidden" id="askError"></div>
+    <div class="actions">
+      <button type="button" id="askCancel">Cancel</button>
+      <button type="submit" class="primary" id="askSubmit">Convene the council</button>
+    </div>
+  </form>
+</dialog>
 
 <footer id="disclaimer">Simulated advisors built from each person's public work. None of them speaks for the real person.</footer>
 

@@ -144,6 +144,9 @@
         <div class="bars">${keys.map(k => `<div class="bar ${k === e.winner ? 'win' : ''}">
           <span><b>${esc(k)}</b> ${esc(optLabel(k))}${(e.capped || []).includes(k) ? '<span class="cap">ruin cap</span>' : ''}</span>
           <span class="track"><span class="fill" data-w="${Number(scores[k]) * 10}"></span></span><b>${esc(scores[k])}</b></div>`).join('')}</div>
+        ${(e.analysis || []).length ? `<div class="cols"><div style="grid-column:1/-1"><h3>Option-by-option analysis</h3><div class="analysis">${e.analysis.map(a =>
+          `<div class="item"><b>${esc(a.option)}: ${esc(optLabel(a.option))}</b><span class="pro">▲ ${esc(a.for)}</span><span class="con">▼ ${esc(a.against)}</span></div>`).join('')}</div></div></div>` : ''}
+        ${e.risks && e.risks.length ? `<div class="cols"><div style="grid-column:1/-1"><h3>Biggest risks</h3><ul>${e.risks.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div></div>` : ''}
         <div class="cols">
           <div><h3>Conditions</h3><ul>${(e.conditions || []).map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
           <div><h3>Next steps</h3><ul>${(e.next_steps || []).map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
@@ -231,7 +234,12 @@
         || '<option>No sessions yet</option>';
       if (S.id) $('sessionSelect').value = S.id;
     }
-    // jump to a brand-new live session automatically
+    // after "New debate", jump to the session it creates, even if another one is still playing
+    if (S.awaitSince) {
+      const fresh = list.find(s => !s.example && s.updated >= S.awaitSince - 2000);
+      if (fresh) { S.awaitSince = 0; if (fresh.id !== S.id) location.hash = fresh.id; return list; }
+    }
+    // otherwise jump to a brand-new live session once the current playback is idle
     const newestLive = list.find(s => !s.done && !s.example);
     if (newestLive && newestLive.id !== S.id && (selectNewest || !S.running)) location.hash = newestLive.id;
     return list;
@@ -247,11 +255,55 @@
   };
   window.addEventListener('hashchange', () => { const id = location.hash.slice(1); if (id && id !== S.id) load(id); });
 
+  // ---------- new debate ----------
+  const dlg = $('askDialog'), form = $('askForm');
+  function showAskError(msg) { $('askError').textContent = msg; $('askError').classList.toggle('hidden', !msg); }
+  $('newBtn').onclick = () => { showAskError(''); dlg.showModal(); form.question.focus(); };
+  $('askCancel').onclick = () => dlg.close();
+  form.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const body = {
+      question: form.question.value, options: form.options.value.split('\n'),
+      context: form.context.value, lean: form.lean.value, quick: form.quick.checked,
+    };
+    $('askSubmit').disabled = true; showAskError('');
+    try {
+      const r = await fetch('/api/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || 'Could not start the debate.');
+      dlg.close(); form.reset();
+      S.awaitSince = Date.now();
+      setStatus('live', 'the Chair is convening the council…');
+      watchJob();
+    } catch (err) { showAskError(err.message); }
+    finally { $('askSubmit').disabled = false; }
+  });
+
+  let jobTimer = null;
+  async function watchJob() {
+    clearInterval(jobTimer);
+    const tick = async () => {
+      let j; try { j = await (await fetch('/api/job')).json(); } catch { return; }
+      if (j.status === 'running') {
+        if (!S.id || S.done) setStatus('live', 'the Chair is convening the council…');
+      } else {
+        clearInterval(jobTimer);
+        if (j.status === 'failed') {
+          showAskError((j.error || 'The debate failed.') + (j.tail ? '\n\nLast output:\n' + j.tail.slice(-600) : ''));
+          dlg.showModal();
+        }
+      }
+    };
+    tick(); jobTimer = setInterval(() => { tick(); if (S.awaitSince) refreshList(); }, 3000);
+  }
+
   // ---------- boot ----------
   (async function boot() {
     S.roster = await (await fetch('/api/roster')).json();
     S.roster.seats.forEach(s => { S.seatsById[s.id] = s; });
     if (S.roster.disclaimer) $('disclaimer').textContent = S.roster.disclaimer;
+    try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); } catch {}
+    try { const j = await (await fetch('/api/job')).json(); if (j.status === 'running') watchJob(); } catch {}
     renderTable(S.roster.default_board);
     const list = await refreshList();
     const id = location.hash.slice(1) || (list[0] && list[0].id);

@@ -96,7 +96,16 @@ h1 { font-size: clamp(20px, 3vw, 30px); margin: 4px 0 8px; font-weight: 800; }
 .faces { display: flex; }
 .face { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--seat); margin-left: -8px; background: #0d2a52; overflow: hidden; }
 .face:first-child { margin-left: 0; }
-.face svg { width: 100%; height: 100%; display: block; }
+.face svg, .face .avatar { width: 100%; height: 100%; display: block; }
+/* portrait mode */
+.avatar.photo { position: relative; overflow: hidden; }
+.avatar.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; user-select: none; }
+.avatar.photo .talk, .avatar.photo .blinkf { opacity: 0; }
+.avatar.photo .blinkf { animation: blinkFrame 5s infinite; animation-delay: var(--blink, 0s); }
+@keyframes blinkFrame { 0%, 95%, 100% { opacity: 0; } 96%, 98% { opacity: 1; } }
+.seat.speaking .avatar.photo .talk { animation: talk .24s steps(1) infinite; }
+.seat.speaking .avatar.photo:not(.has-talk) .base { animation: speakBob .5s ease-in-out infinite alternate; transform-origin: 50% 85%; }
+@keyframes speakBob { from { transform: scale(1) rotate(-.6deg); } to { transform: scale(1.035) rotate(.6deg) translateY(-1.5%); } }
 @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } }
 
 .verdict { margin-top: 18px; padding: 20px; border-color: rgba(74,222,128,.45); animation: slideIn .6s; }
@@ -116,6 +125,33 @@ h1 { font-size: clamp(20px, 3vw, 30px); margin: 4px 0 8px; font-weight: 800; }
 .vactions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
 .vactions a, .vactions button { font: inherit; font-size: 13px; color: var(--text); background: rgba(255,255,255,.08);
   border: 1px solid var(--panel-b); border-radius: 8px; padding: 6px 12px; text-decoration: none; cursor: pointer; }
+
+/* new debate */
+.controls button.primary, dialog button.primary { background: var(--accent); color: #04142b; border-color: var(--accent); font-weight: 700; }
+dialog { width: min(600px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; border: 1px solid var(--panel-b); border-radius: 16px;
+  background: #0b2347; color: var(--text); padding: 22px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+dialog::backdrop { background: rgba(2, 10, 24, .7); backdrop-filter: blur(3px); }
+dialog h2 { margin: 0 0 4px; }
+dialog .hint { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+dialog label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+dialog .sub { color: var(--muted); font-weight: 400; }
+dialog .req { color: var(--warn); }
+dialog textarea, dialog input:not([type=checkbox]) { display: block; width: 100%; margin-top: 5px; font: inherit; font-size: 14px; font-weight: 400;
+  color: var(--text); background: rgba(255,255,255,.06); border: 1px solid var(--panel-b); border-radius: 8px; padding: 9px 10px; resize: vertical; }
+dialog textarea:focus, dialog input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+dialog .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+dialog .check { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; }
+dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+dialog button { font: inherit; font-size: 14px; color: var(--text); background: rgba(255,255,255,.08); border: 1px solid var(--panel-b);
+  border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+.ask-error { background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.5); color: #fecaca; border-radius: 8px;
+  padding: 10px; font-size: 13px; margin-bottom: 10px; white-space: pre-wrap; }
+@media (max-width: 640px) { dialog .row { grid-template-columns: 1fr; } }
+.analysis { display: grid; gap: 8px; margin: 6px 0 12px; }
+.analysis .item { display: grid; grid-template-columns: minmax(90px, 200px) 1fr 1fr; gap: 10px; font-size: 13px; line-height: 1.45;
+  background: rgba(255,255,255,.04); border-radius: 10px; padding: 10px; }
+.analysis .pro { color: #bbf7d0; } .analysis .con { color: #fecaca; }
+@media (max-width: 640px) { .analysis .item { grid-template-columns: 1fr; } }
 
 /* transcript */
 .transcript { background: var(--panel); border: 1px solid var(--panel-b); border-radius: 14px; padding: 14px; max-height: calc(100vh - 110px);

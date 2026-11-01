@@ -1,6 +1,12 @@
 {
   "disclaimer": "Simulated advisors built from each person's public work. None of them speaks for the real person.",
-  "default_board": ["martell", "hormozi", "buffett", "bezos", "garyvee"],
+  "default_board": [
+    "martell",
+    "hormozi",
+    "buffett",
+    "bezos",
+    "garyvee"
+  ],
   "seats": [
     {
       "id": "martell",
@@ -9,7 +15,15 @@
       "brain": ".claude/skills/council/brains/martell.md",
       "agent": "council-martell",
       "color": "#38bdf8",
-      "avatar": { "skin": "#f1c7a5", "hair": "#3b2a20", "style": "short", "beard": "stubble", "glasses": false, "shirt": "#0f172a" }
+      "avatar": {
+        "skin": "#eebf9c",
+        "hair": "#2e221b",
+        "style": "short",
+        "beard": "stubble",
+        "eyes": "#3f5f7a",
+        "age": "mid",
+        "shirt": "#111827"
+      }
     },
     {
       "id": "hormozi",
@@ -18,7 +32,19 @@
       "brain": ".claude/skills/council/brains/hormozi.md",
       "agent": "council-hormozi",
       "color": "#f59e0b",
-      "avatar": { "skin": "#e5b48f", "hair": "#2b1d14", "style": "cap-long", "beard": "full", "glasses": false, "shirt": "#111827", "cap": "#3f3f46" }
+      "avatar": {
+        "skin": "#d9a17a",
+        "hair": "#2b1d14",
+        "style": "cap-long",
+        "beard": "full",
+        "eyes": "#4a3222",
+        "age": "mid",
+        "shirt": "#3b3f63",
+        "pattern": "plaid",
+        "tee": "#ebe6da",
+        "cap": "#4b4b52",
+        "browWeight": 6
+      }
     },
     {
       "id": "buffett",
@@ -27,7 +53,20 @@
       "brain": ".claude/skills/council/brains/buffett.md",
       "agent": "council-buffett",
       "color": "#a3e635",
-      "avatar": { "skin": "#f3d0b8", "hair": "#e5e7eb", "style": "side-part", "beard": "none", "glasses": true, "shirt": "#1e3a8a" }
+      "avatar": {
+        "skin": "#f2cdb4",
+        "hair": "#eceff3",
+        "brow": "#c9ccd2",
+        "style": "side-part",
+        "beard": "none",
+        "glasses": true,
+        "eyes": "#6b7f99",
+        "age": "senior",
+        "shirt": "#1e2a44",
+        "collar": "#f8fafc",
+        "tie": "#b91c1c",
+        "browWeight": 5.5
+      }
     },
     {
       "id": "bezos",
@@ -36,7 +75,16 @@
       "brain": ".claude/skills/council/brains/bezos.md",
       "agent": "council-bezos",
       "color": "#f472b6",
-      "avatar": { "skin": "#f0c3a0", "hair": "#6b5b50", "style": "bald", "beard": "none", "glasses": false, "shirt": "#334155" }
+      "avatar": {
+        "skin": "#eebe9c",
+        "hair": "#6b5b50",
+        "style": "bald",
+        "beard": "none",
+        "eyes": "#4a5a4a",
+        "age": "senior",
+        "shirt": "#1f2a3a",
+        "collar": "#bcd4ec"
+      }
     },
     {
       "id": "garyvee",
@@ -45,7 +93,15 @@
       "brain": ".claude/skills/council/brains/garyvee.md",
       "agent": "council-garyvee",
       "color": "#a78bfa",
-      "avatar": { "skin": "#ecc19c", "hair": "#2a1f1a", "style": "short", "beard": "stubble", "glasses": false, "shirt": "#18181b" }
+      "avatar": {
+        "skin": "#e9bc96",
+        "hair": "#231a15",
+        "style": "short",
+        "beard": "stubble",
+        "eyes": "#4a3426",
+        "age": "mid",
+        "shirt": "#18181b"
+      }
     }
   ]
 }

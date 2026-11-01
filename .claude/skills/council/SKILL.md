@@ -15,6 +15,9 @@ Roster, colors and pillars are in `.claude/skills/council/roster.json`. All seat
 - `/council --seats hormozi,buffett <decision>`: only the named seats.
 - `/council ask <seat> <question>`: one advisor, one answer, nothing logged.
 
+## Non-interactive runs
+If the prompt says it came from the room's "New debate" form (non-interactive), skip Step 0's questions entirely. Use the details given, propose options if none were given, write any assumptions into the brief's `context`, and go straight to Step 1.
+
 ## Step 0: Intake
 A good decision needs: **the decision**, **2–4 concrete options (A, B, C…)**, **key numbers** (price, costs, audience size, cash on hand), **constraints** (time, money, team) and **what success looks like**. Also ask which way the user leans.
 If anything important is missing, ask up to 4 short questions in one message, then wait. Do not invent the user's numbers.
@@ -64,9 +67,11 @@ Log each one as `{"type":"vote","seat":"<id>", ...reply}`.
 ```json
 {"type":"verdict","winner":"B","headline":"Do B, but pre-sell it first","scores":{"A":6.1,"B":7.8},
  "capped":[],"summary":"2–3 sentences","conditions":["…","…"],"next_steps":["…","…","…"],
- "dissent":"Who disagreed most and why, one sentence"}
+ "dissent":"Who disagreed most and why, one sentence",
+ "analysis":[{"option":"A","for":"strongest case for it, 1 sentence","against":"strongest case against, 1 sentence"},{"option":"B","for":"…","against":"…"}],
+ "risks":["the 2–3 biggest risks to the winning option, each with how to de-risk it"]}
 ```
-- Write a fuller `verdict.md` (decision, options, each seat's position, score table, conditions, next 7 days, dissent and the disclaimer) and save it with `node app/log.js verdict $ID < /path/to/verdict.md` (write it to a temp file first).
+- Write a fuller `verdict.md` (decision, options, each seat's position, score table, option-by-option analysis, biggest risks, conditions, next 7 days, dissent and the disclaimer) and save it with `node app/log.js verdict $ID < /path/to/verdict.md` (write it to a temp file first).
 
 ## Step 6: Report back
 Run `node app/export.js $ID`. It writes `founder-council-$ID.html`, a single file that plays this council in any browser with no server (good for phones and sharing).

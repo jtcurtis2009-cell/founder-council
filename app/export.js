@@ -6,6 +6,7 @@
 //   node app/export.js <session-id>    -> exports just that session
 const fs = require('fs');
 const path = require('path');
+const { withPortraits } = require('./portraits');
 
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(__dirname, 'public');
@@ -28,7 +29,7 @@ for (const id of fs.readdirSync(SESSIONS)) {
 }
 if (!Object.keys(sessions).length) { console.error('No sessions found' + (only ? ' for ' + only : '')); process.exit(1); }
 
-const data = { roster: readJSON(path.join(ROOT, '.claude/skills/council/roster.json'), { seats: [] }), sessions };
+const data = { roster: withPortraits(readJSON(path.join(ROOT, '.claude/skills/council/roster.json'), { seats: [] }), true), sessions };
 
 // Serve /api/* from the embedded data, so room.js runs unchanged.
 const shim = `window.__COUNCIL__ = ${JSON.stringify(data).replace(/</g, '\\u003c')};
