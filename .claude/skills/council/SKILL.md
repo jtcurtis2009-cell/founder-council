@@ -69,7 +69,8 @@ Log each one as `{"type":"vote","seat":"<id>", ...reply}`.
 - Write a fuller `verdict.md` (decision, options, each seat's position, score table, conditions, next 7 days, dissent and the disclaimer) and save it with `node app/log.js verdict $ID < /path/to/verdict.md` (write it to a temp file first).
 
 ## Step 6: Report back
-In chat, give: the winner and score, the 3 conditions, the dissent and the link http://localhost:4730/#$ID. Keep it short; the room is the show.
+Run `node app/export.js $ID`. It writes `founder-council-$ID.html`, a single file that plays this council in any browser with no server (good for phones and sharing).
+In chat, give the path to that file and the winner and score, the 3 conditions, the dissent and the link http://localhost:4730/#$ID. Keep it short; the room is the show.
 
 ## Chair rules
 - Never put words in a real person's mouth as fact. They are simulations, and the room shows the disclaimer.

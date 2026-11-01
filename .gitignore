@@ -4,3 +4,6 @@ node_modules/
 # your councils stay private; the example is committed
 sessions/*
 !sessions/example-paid-founder-event/
+
+# exported single-file rooms
+founder-council*.html

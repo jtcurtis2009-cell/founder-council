@@ -28,6 +28,31 @@ You ──/council──▶ Chair (Claude Code)
 2. **Crossfire.** The Chair finds the 2–3 questions the decision really turns on and shows them as clash cards. If 4 or more seats agree, the Chair pushes back and argues for the strongest losing option.
 3. **Final vote.** Each seat scores every option from 0 to 10 and can flag ruin risk. Scores are weighted by how much each seat's pillar matters to the decision. Any ruin flag caps that option at 5.0.
 
+## Getting started (first time, step by step)
+
+You do this once on a Mac or Windows computer. It doesn't run inside the Claude phone app.
+
+1. **Install Node.js**: download the "LTS" version from https://nodejs.org and install it.
+2. **Install Claude Code**: follow https://claude.com/claude-code. On Mac, open **Terminal**; on Windows, open **PowerShell**. Then run:
+   ```bash
+   npm install -g @anthropic-ai/claude-code
+   ```
+3. **Download this project** in the same Terminal window:
+   ```bash
+   git clone -b claude/eager-bell-hlfzv4 https://github.com/jtcurtis2009-cell/Salesforce-BOT-.git founder-council
+   cd founder-council
+   ```
+   (No git? On GitHub, switch to the `claude/eager-bell-hlfzv4` branch, click **Code → Download ZIP**, unzip it, and `cd` into the folder.)
+4. **Start the room**:
+   ```bash
+   npm start
+   ```
+   Then open http://localhost:4730 in your browser. The example debate plays. Leave this window open.
+5. **Open a second Terminal window**, `cd` into the same folder, and run `claude`. Sign in when asked.
+6. Type `/council` followed by your decision (see the example below) and watch the room.
+
+**Just want to look at it?** Open `founder-council.html` (created by `npm run export`) in any browser. That one file has the whole room and every saved debate, and needs nothing installed.
+
 ## Quick start
 
 Requirements: [Claude Code](https://claude.com/claude-code) (your Claude plan covers it, with no API key needed) and Node.js 20+.

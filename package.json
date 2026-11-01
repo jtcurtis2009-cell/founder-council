@@ -4,8 +4,11 @@
   "private": true,
   "description": "Five simulated founders debate your business decision in an animated room. The council runs in Claude Code; the room plays it back.",
   "scripts": {
-    "start": "node app/server.js"
+    "start": "node app/server.js",
+    "export": "node app/export.js"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "license": "MIT"
 }
