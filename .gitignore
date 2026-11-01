@@ -1,0 +1,6 @@
+node_modules/
+.env
+.DS_Store
+# your councils stay private; the example is committed
+sessions/*
+!sessions/example-paid-founder-event/

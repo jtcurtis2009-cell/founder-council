@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Founder Council</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="room.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">◆</span> Founder Council</div>
+  <nav class="phases" id="phases">
+    <span data-phase="brief">Brief</span>
+    <span data-phase="Openings">Openings</span>
+    <span data-phase="Crossfire">Crossfire</span>
+    <span data-phase="Final vote">Vote</span>
+    <span data-phase="verdict">Verdict</span>
+  </nav>
+  <div class="controls">
+    <select id="sessionSelect" aria-label="Session"></select>
+    <button id="speedBtn" title="Playback speed">1×</button>
+    <button id="replayBtn" title="Replay from the start">↺ Replay</button>
+    <button id="skipBtn" title="Jump to the end">⏭ Skip</button>
+  </div>
+</header>
+
+<main>
+  <section class="stage">
+    <div class="title-row">
+      <h1 id="title">Waiting for the Chair…</h1>
+      <div class="status" id="status"><span class="dot"></span><span id="statusText">idle</span></div>
+    </div>
+    <div class="table" id="table"></div>
+    <div class="options" id="options"></div>
+
+    <div class="speech" id="speech">
+      <div class="speech-who" id="speechWho">The Chair</div>
+      <div class="speech-head" id="speechHead">Run <code>/council &lt;your decision&gt;</code> in Claude Code and the council convenes here.</div>
+      <div class="speech-body" id="speechBody"></div>
+    </div>
+
+    <div class="pushback hidden" id="pushback"></div>
+    <div class="clashes" id="clashes"></div>
+    <div class="verdict hidden" id="verdict"></div>
+  </section>
+
+  <aside class="transcript">
+    <h2>Transcript</h2>
+    <ol id="log"></ol>
+  </aside>
+</main>
+
+<footer id="disclaimer">Simulated advisors built from each person's public work. None of them speaks for the real person.</footer>
+
+<script src="avatar.js"></script>
+<script src="room.js"></script>
+</body>
+</html>
