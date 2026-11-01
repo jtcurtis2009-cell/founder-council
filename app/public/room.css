@@ -173,6 +173,10 @@ dialog .mode input:focus-visible + span { outline: 2px solid var(--accent); }
 .alloc-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin-bottom: 12px; }
 @media (max-width: 640px) { .milestone { grid-template-columns: 1fr; } dialog .modes { grid-template-columns: 1fr; } }
 
+#companyDialog { width: min(820px, calc(100vw - 32px)); }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 50; background: #0b2347; border: 1px solid var(--accent);
+  color: var(--text); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.5); font-size: 14px; max-width: calc(100vw - 32px); white-space: pre-wrap; }
+
 /* transcript */
 .transcript { background: var(--panel); border: 1px solid var(--panel-b); border-radius: 14px; padding: 14px; max-height: calc(100vh - 110px);
   overflow: auto; position: sticky; top: 76px; }

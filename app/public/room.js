@@ -315,13 +315,46 @@
     tick(); jobTimer = setInterval(() => { tick(); if (S.awaitSince) refreshList(); }, 3000);
   }
 
+  // ---------- company profile + update ----------
+  function toast(msg, ms = 4000) {
+    const t = $('toast'); t.textContent = msg; t.classList.remove('hidden');
+    clearTimeout(toast.timer); if (ms) toast.timer = setTimeout(() => t.classList.add('hidden'), ms);
+  }
+  const cdlg = $('companyDialog'), cform = $('companyForm');
+  $('companyBtn').onclick = async () => {
+    $('companyError').classList.add('hidden');
+    const j = await (await fetch('/api/company')).json();
+    cform.text.value = j.text || ''; cdlg.showModal();
+  };
+  $('companyCancel').onclick = () => cdlg.close();
+  cform.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const r = await fetch('/api/company', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: cform.text.value }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { $('companyError').textContent = j.error || 'Could not save.'; $('companyError').classList.remove('hidden'); return; }
+    cdlg.close(); toast('Company profile saved. The next debate will use it.');
+  });
+  $('updateBtn').onclick = async () => {
+    $('updateBtn').disabled = true; toast('Checking for updates…', 0);
+    try {
+      const r = await fetch('/api/update', { method: 'POST' });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || 'Update failed.');
+      if (!j.changed) { toast('You already have the latest version.'); return; }
+      toast('Updated! Restarting the room…\n\n' + j.log, 0);
+      const wait = async () => { try { await fetch('/api/health'); location.reload(); } catch { setTimeout(wait, 1000); } };
+      setTimeout(wait, 2500);
+    } catch (e) { toast(e.message, 12000); }
+    finally { $('updateBtn').disabled = false; }
+  };
+
   // ---------- boot ----------
   (async function boot() {
     S.roster = await (await fetch('/api/roster')).json();
     S.roster.seats.forEach(s => { S.seatsById[s.id] = s; });
     if (S.roster.disclaimer) $('disclaimer').textContent = S.roster.disclaimer;
     if (S.roster.company) $('company').textContent = S.roster.company;
-    try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); } catch {}
+    try { const h = await (await fetch('/api/health')).json(); if (h.ask) $('newBtn').classList.remove('hidden'); if (h.manage) { $('companyBtn').classList.remove('hidden'); $('updateBtn').classList.remove('hidden'); } } catch {}
     try { const j = await (await fetch('/api/job')).json(); if (j.status === 'running') watchJob(); } catch {}
     renderTable(S.roster.default_board);
     const list = await refreshList();

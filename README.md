@@ -30,27 +30,27 @@ You ──/council──▶ Chair (Claude Code)
 
 ## Getting started (first time, step by step)
 
-You do this once on a Mac or Windows computer. It doesn't run inside the Claude phone app.
+You do this once on a Mac. It doesn't run inside the Claude phone app.
 
 1. **Install Node.js**: download the "LTS" version from https://nodejs.org and install it.
-2. **Install Claude Code**: follow https://claude.com/claude-code. On Mac, open **Terminal**; on Windows, open **PowerShell**. Then run:
+2. **Install Claude Code** in Terminal (use `sudo` if it says EACCES):
    ```bash
    npm install -g @anthropic-ai/claude-code
    ```
-3. **Download this project** in the same Terminal window:
+3. **Download this project**:
    ```bash
    git clone https://github.com/jtcurtis2009-cell/founder-council.git
-   cd founder-council
    ```
-   (No git? Go to https://github.com/jtcurtis2009-cell/founder-council, click **Code → Download ZIP**, unzip it, and `cd` into the folder.)
-   If `npm install -g` fails with `EACCES`, put `sudo` in front of it and enter your Mac password.
-4. **Start the room**:
-   ```bash
-   npm start
-   ```
-   Then open http://localhost:4730 in your browser. The example debate plays. Leave this window open.
-5. **Run `claude` once** in a second Terminal window and sign in (only needed the first time), then close it.
-6. In the room, click **＋ New debate**, type your decision, options and numbers, and click **Convene the council**. The room runs Claude Code in the background on your Claude plan and switches to the debate automatically. You can also type `/council <your decision>` inside Claude Code yourself.
+4. **Sign in to Claude Code once:** run `claude` in Terminal, finish the sign-in, then type `/exit`.
+
+## Everyday use (no Terminal needed)
+
+- **Start:** in Finder, open your home folder → `founder-council`, then double-click **Start Founder Council.command**. The room opens in your browser. Keep the Terminal window it opens running; close it to stop the room. (First time only: if macOS blocks it, right-click → **Open** → **Open**.)
+- **New debate:** click **＋ New debate**. Choose **Decision** to pick between options, or **Road to 2,000** for a growth plan.
+- **Company profile:** click **🏢 Company** to update your numbers, goals and constraints. Every advisor reads it before each debate.
+- **Get the latest version:** click **⬇ Update**. It downloads new changes, keeps your profile edits, and restarts the room by itself.
+
+**Bigger changes** (new advisors, new features): ask Claude in the chat where this was built, then click **⬇ Update**. Or run `claude` inside the `founder-council` folder and describe the change. When it's done, tell it to "commit and push" so the change is saved to GitHub.
 
 **Just want to look at it?** Open `founder-council.html` (created by `npm run export`) in any browser. That one file has the whole room and every saved debate, and needs nothing installed.
 

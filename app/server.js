@@ -5,7 +5,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { withPortraits } = require('./portraits');
-const { spawn } = require('child_process');
+const { spawn, execFile } = require('child_process');
 
 const PORT = Number(process.env.PORT) || 4730;
 const ROOT = path.join(__dirname, '..');
@@ -109,12 +109,51 @@ function jobStatus() {
   return { status: job.status, title: job.title, started: job.started, finished: job.finished, error: job.error, tail };
 }
 
+// ---------- In-room "Update" and "Company" editor ----------
+const COMPANY = path.join(ROOT, '.claude', 'skills', 'council', 'company.md');
+const git = (args) => new Promise(resolve =>
+  execFile('git', args, { cwd: ROOT, timeout: 120000 }, (err, stdout, stderr) => resolve({ ok: !err, out: (stdout + stderr).trim() })));
+
+async function update(res) {
+  if (job && job.status === 'running') return send(res, 409, { error: 'A debate is running. Update after it finishes.' });
+  if (!fs.existsSync(path.join(ROOT, '.git'))) return send(res, 400, { error: 'This folder was not downloaded with git, so it cannot update itself. Download it again with: git clone https://github.com/jtcurtis2009-cell/founder-council.git' });
+  const before = await git(['rev-parse', 'HEAD']);
+  // keep any local edits (e.g. your company profile): commit them locally first, then rebase onto the new version
+  const dirty = await git(['status', '--porcelain']);
+  if (dirty.out) {
+    await git(['add', '-A']);
+    await git(['-c', 'user.name=Founder Council', '-c', 'user.email=council@localhost', 'commit', '-q', '-m', 'Local edits (saved before update)']);
+  }
+  const pull = await git(['pull', '--rebase', '--autostash']);
+  if (!pull.ok) {
+    await git(['rebase', '--abort']);
+    return send(res, 500, { error: 'Update failed. Your files were left as they were.\n\n' + pull.out.slice(-800) });
+  }
+  const after = await git(['rev-parse', 'HEAD']);
+  const changed = before.out !== after.out;
+  const log = changed ? (await git(['log', '--oneline', '--no-decorate', before.out + '..' + after.out])).out : '';
+  send(res, 200, { ok: true, changed, log });
+  if (changed) { console.log('  ⬇ Updated:\n' + log); setTimeout(() => process.exit(75), 400); }
+}
+
 http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
   const p = decodeURIComponent(url.pathname);
 
-  if (p === '/api/health') return send(res, 200, { ok: true, ask: true });
+  if (p === '/api/health') return send(res, 200, { ok: true, ask: true, manage: true });
   if (p === '/api/job') return send(res, 200, jobStatus());
+  if (p === '/api/update' && req.method === 'POST') return update(res);
+  if (p === '/api/company' && req.method === 'GET') {
+    try { return send(res, 200, { text: fs.readFileSync(COMPANY, 'utf8') }); } catch { return send(res, 200, { text: '' }); }
+  }
+  if (p === '/api/company' && req.method === 'POST') {
+    return readBody(req, 100000).then(raw => {
+      let b; try { b = JSON.parse(raw); } catch { return send(res, 400, { error: 'Bad request' }); }
+      if (typeof b.text !== 'string' || b.text.trim().length < 20) return send(res, 400, { error: 'The profile looks empty.' });
+      fs.writeFileSync(COMPANY, b.text.replace(/\r\n/g, '\n'));
+      send(res, 200, { ok: true });
+    }).catch(() => send(res, 413, { error: 'Too much text' }));
+  }
   if (p === '/api/ask' && req.method === 'POST') {
     return readBody(req).then(raw => {
       let q; try { q = JSON.parse(raw); } catch { return send(res, 400, { error: 'Bad request' }); }

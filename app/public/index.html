@@ -20,6 +20,8 @@
   </nav>
   <div class="controls">
     <button id="newBtn" class="primary hidden" title="Start a new debate">＋ New debate</button>
+    <button id="companyBtn" class="hidden" title="Edit your company profile">🏢 Company</button>
+    <button id="updateBtn" class="hidden" title="Download the latest version">⬇ Update</button>
     <select id="sessionSelect" aria-label="Session"></select>
     <button id="speedBtn" title="Playback speed">1×</button>
     <button id="replayBtn" title="Replay from the start">↺ Replay</button>
@@ -78,6 +80,21 @@
     </div>
   </form>
 </dialog>
+
+<dialog id="companyDialog">
+  <form id="companyForm" method="dialog">
+    <h2>Company profile</h2>
+    <p class="hint">The Chair and all five advisors read this before every debate. Update numbers, goals and constraints here, then click Save.</p>
+    <textarea name="text" rows="22" spellcheck="true" style="font-family: ui-monospace, Menlo, monospace; font-size: 13px;"></textarea>
+    <div class="ask-error hidden" id="companyError"></div>
+    <div class="actions">
+      <button type="button" id="companyCancel">Cancel</button>
+      <button type="submit" class="primary" id="companySave">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast hidden" id="toast"></div>
 
 <footer id="disclaimer">Simulated advisors built from each person's public work. None of them speaks for the real person.</footer>
 
